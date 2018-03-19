@@ -3,6 +3,7 @@ package thekla;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,30 +14,19 @@ import java.util.Map.Entry;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration;
-import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparser.Navigator;
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
-import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
-import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
@@ -51,15 +41,13 @@ public class App
 		System.out.println("Please insert the path to the src file under inspection.");
 		//and read his/her input
 		Scanner scanner = new Scanner (System.in);
-		String name = scanner.next();		
+		String name = scanner.next();	
+		scanner.close();
 		//create a file that keeps all the relevant information
-        HelperMethods inF = new HelperMethods();
-		//check that the given directory is the src file
+        OutputCreator inF = new OutputCreator();
 		FileTraversal ftr = new FileTraversal();
-        //boolean flag = ftr.correctInput(name);
         
 		String fileName = inF.createOutputFile(name);
-		//System.out.println("You inserted: " + fileName);
 		
 		List<String> files = new ArrayList<>();
 		files = ftr.getFiles(name);
@@ -83,10 +71,6 @@ public class App
 				VoidVisitor<HashMap<SimpleName, BlockStmt>> methodNameCollector = new MethodNameCollector();
 				methodNameCollector.visit(cu, methodNames);
 				
-				//for (Entry<SimpleName, BlockStmt> entry : methodNames.entrySet()) {
-				//	System.out.println("Method Name: " + entry.getKey()+" Method Body: "+entry.getValue());
-				//}
-				
 				//this will find all the persistent storages
 				HashMap<FieldDeclaration, String> fields = new HashMap<>();
 				List<FieldDeclaration> fd = Navigator.findAllNodesOfGivenClass(cu, FieldDeclaration.class);
@@ -94,16 +78,12 @@ public class App
 					ResolvedType fit = JavaParserFacade.get(typeSolver).convertToUsage(f.getVariables().get(0).getType(), f);
 					fields.put(f, fit.asReferenceType().getQualifiedName());
 				}
-				
-				
+								
 				HashMap<String, String> fields2 = new HashMap<>();
 				for (Entry<FieldDeclaration, String> entry : fields.entrySet()) {
-					//System.out.println("Method: " + entry.getKey()+" Method Type: "+entry.getValue());
 					FieldDeclaration f = entry.getKey();
-					String k = f.getVariables().get(0).toString();
-					String[] p = k.split("=");
-					fields2.put(p[0], entry.getValue());
-					//System.out.println(p[0]);
+					String ff = f.getVariables().get(0).getName().toString();
+					fields2.put(ff, entry.getValue());			
 				}
 				
 				
@@ -135,18 +115,26 @@ public class App
 		        	}
 		        }
 		        
-				HashMap<Statement,String> methods2 = new HashMap<>();
+				HashMap<Statement,Entry<SimpleName,String>> methods2 = new HashMap<>();
 
 				for (Entry<SimpleName, List<Statement>> entry : methodStmnt.entrySet()) {
 					//System.out.println("Method: " + entry.getKey()+" Has the following statements: ");
 					for(Statement st : entry.getValue()) {
 						List<MethodCallExpr> methodCalls2 = Navigator.findAllNodesOfGivenClass(st, MethodCallExpr.class);
-						methodCalls2.forEach(mc-> methods2.put(st , JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature()));
+						methodCalls2.forEach(mc-> methods2.put(st , new SimpleEntry(entry.getKey(),JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature())));
 					}
 				}
+				
+				//for(Entry<Statement,Entry<SimpleName,String>> entry : methods2.entrySet()) {
+				//	System.out.println("The statement: " + entry.getKey() + " contains the following information:");
+				//	Entry<SimpleName,String> help = entry.getValue();
+				//    System.out.println("Belongs to: " + help.getKey() + " and has type: " + help.getValue());
+			//	}
 		        
 		        //now i need to get flows
-		        inF.methodFlows(methodStmnt, libraries, methods2, fields2);		      
+				System.out.println("info for: " + s);
+				DataFlowExtractor dfe = new DataFlowExtractor();
+				dfe.methodFlows(methodStmnt, libraries, methods2, fields2);		      
 			}
 
 		} catch (FileNotFoundException e) {

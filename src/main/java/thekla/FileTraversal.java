@@ -11,30 +11,20 @@ public class FileTraversal {
 		System.out.println("File traversal created!");
 	}
 	
-	public boolean correctInput(String path) {
-		boolean flag = false;
-		
-		String[] temp = path.split("\\\\");
-		if(temp[temp.length-1].equals("src")) {
-			flag=true;
-		}				
-		return flag;
-	}
-	
 	public List<String> getFiles(String path){
 		List<String> files = new ArrayList<>();
-		File flag = new File(path);		
-		File[] temp = flag.listFiles();
-		for(File k : temp){
-			if(k.isDirectory()) {
+		File inputFile = new File(path);		
+		File[] containedFiles = inputFile.listFiles();
+		for(File f : containedFiles){
+			if(f.isDirectory()) {
 				//i need to go deeper to get the source file
-				for(File j : k.listFiles()){
+				for(File j : f.listFiles()){
 					List<String> help = new ArrayList<>();
 					help = helper(j);
 					files.addAll(help);
 				} 
-			}else {
-					files.add(k.getAbsolutePath());	
+			}else if (f.getAbsolutePath().contains("java")){
+				files.add(f.getAbsolutePath());	
 				}
 		}		
 		return files;
@@ -49,8 +39,7 @@ public class FileTraversal {
 				help = helper(j);
 				h.addAll(help);
 			}
-		} else{
-			//traverse it to get all the methods
+		} else if (f.getAbsolutePath().contains("java")){
 			h.add(f.getAbsolutePath());				
 		}	
 		return h;		
