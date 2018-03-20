@@ -8,7 +8,7 @@ public class FileTraversal {
 	
 	//constructor
 	FileTraversal(){
-		System.out.println("File traversal created!");
+		System.out.println("Object FileTraversal created!");
 	}
 	
 	public List<String> getFiles(String path){
@@ -16,32 +16,23 @@ public class FileTraversal {
 		File inputFile = new File(path);		
 		File[] containedFiles = inputFile.listFiles();
 		for(File f : containedFiles){
-			if(f.isDirectory()) {
-				//i need to go deeper to get the source file
-				for(File j : f.listFiles()){
-					List<String> help = new ArrayList<>();
-					help = helper(j);
-					files.addAll(help);
-				} 
-			}else if (f.getAbsolutePath().contains("java")){
-				files.add(f.getAbsolutePath());	
-				}
+			files = traverse(f);
 		}		
 		return files;
 	}
 	
-	public List<String> helper(File f){
-		List<String> h = new ArrayList<>();		
-		if(f.isDirectory()){
+	public List<String> traverse(File file){
+		List<String> files = new ArrayList<>();		
+		if(file.isDirectory()){
 			//go deeper
-			for(File j : f.listFiles()){
+			for(File j : file.listFiles()){
 				List<String> help = new ArrayList<>();
-				help = helper(j);
-				h.addAll(help);
+				help = traverse(j);
+				files.addAll(help);
 			}
-		} else if (f.getAbsolutePath().contains("java")){
-			h.add(f.getAbsolutePath());				
+		} else if (file.getAbsolutePath().contains("java")){
+			files.add(file.getAbsolutePath());				
 		}	
-		return h;		
+		return files;		
 	}
 }

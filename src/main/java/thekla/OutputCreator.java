@@ -22,7 +22,7 @@ public class OutputCreator {
 	
 	//constructor
 	OutputCreator(){
-		System.out.println("Output Creator created!!");
+		System.out.println("Object OutputCreator created!!");
 	}
 	
 	public String createOutputFile(String input) {
@@ -64,13 +64,6 @@ public class OutputCreator {
 			
 			bw.println("The flows are: ");
 			bw.println();
-			//for (Entry<SimpleName, List<Object>> entry : methodCalls.entrySet()) {
-			//    SimpleName key = entry.getKey();
-			//    List<Object> value = entry.getValue();
-			//    for(Object aString : value){
-			//    	bw.println("From : " + key + " To : " + aString);
-			//    }
-			//}
 			bw.println();
 			bw.close();
 			System.out.println("I have finished!!");		    

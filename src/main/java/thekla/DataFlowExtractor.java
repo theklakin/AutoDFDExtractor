@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.AbstractMap.SimpleEntry;
 
 import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.symbolsolver.javaparser.Navigator;
+import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 
 public class DataFlowExtractor {
 
@@ -23,18 +27,17 @@ public class DataFlowExtractor {
 			 * 2) method call
 			 * methodName = entry.getKey();
 			 */
+			
 			//we inspect each method individually
 			System.out.println("Info for: " + entry.getKey()); 
 			HashMap<String,String> localAlias = new HashMap<>();
 			List<String> localNonSensitive = new ArrayList<>();
 			
-			for(Statement st : entry.getValue()) {	
-				
+			for(Statement st : entry.getValue()) {					
 				if(st.isExpressionStmt()) {
 					boolean flag = false;
 					String state = st.toString();
 					if(state.contains("=")) {
-						//System.out.println("State: " + state);
 						String[] stateParts = state.split("=");
 						String alias = stateParts[0];
 						String assignment = stateParts[1];
@@ -79,23 +82,43 @@ public class DataFlowExtractor {
 				String hasType = checkStatement(entry.getKey(), st, methods);
 				if(hasType!="") {
 					//it is a method call
-					System.out.println("Type: " + hasType );
-					String entity = belongsTo(hasType, libraries);
+					String[] typeParts = hasType.split("\\.");
+					String entity = belongsTo(typeParts, libraries);
+					//System.out.println("Possible Entity for type: " + hasType + " is: " + entity);
+					flows.put(hasType, new SimpleEntry(entry.getKey().toString(), entity));
 				}
 				//statementExistance.put(st, exists);
 				//System.out.println(st + " has value: " + exists);
 			}		
-		}		
+		}	
+		
+		for (Entry<String, Entry<String,String>> entry : flows.entrySet()) {
+			Entry<String,String> inside = entry.getValue();
+			System.out.println("There is a flow between: " + inside.getKey() + " and: " + inside.getValue() + " with the name: " + entry.getKey());
+			
+		}
 	}
 	
-	public String belongsTo(String hasType, List<ImportDeclaration> libraries) {
-		String entity = "";
-		
-		for(ImportDeclaration id : libraries) {
-			
-			System.out.println("Possible Entities: " + id.getNameAsString());
+	public String belongsTo(String[] type, List<ImportDeclaration> libraries) {
+		String entity = "";	
+		List<String> possible = new ArrayList<>();
+		for(ImportDeclaration id : libraries) {		
+			String lib = id.toString();
+			if(lib.contains(type[0])) {
+				possible.add(lib);
+			}
+			//System.out.println("Possible Entities: " + id.getNameAsString());
 		}
 		
+		if(possible.size()==1) {
+			entity = possible.get(0);
+		}else {
+			for(String st : possible) {
+				if(st.contains(type[2])) {
+					entity = st;
+				}				
+			}
+		}		
 		return entity;
 	}
 	
@@ -114,9 +137,6 @@ public class DataFlowExtractor {
 	
 	public String getContainedField(String statement, HashMap<String, String> fields) {
 		String containedField = "";
-		//String state = statement.toString();
-		System.out.println("State: " + statement);
-
 		for(Entry<String,String> entry : fields.entrySet()) {
 			String field = entry.getKey();
 			if(statement.contains(field)) {
@@ -144,5 +164,4 @@ public class DataFlowExtractor {
 		}		
 		return type;
 	}
-
 }

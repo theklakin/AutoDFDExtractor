@@ -44,13 +44,13 @@ public class App
 		String name = scanner.next();	
 		scanner.close();
 		//create a file that keeps all the relevant information
-        OutputCreator inF = new OutputCreator();
-		FileTraversal ftr = new FileTraversal();
+        OutputCreator output = new OutputCreator();
+		FileTraversal fileTraverse = new FileTraversal();
         
-		String fileName = inF.createOutputFile(name);
+		String fileName = output.createOutputFile(name);
 		
 		List<String> files = new ArrayList<>();
-		files = ftr.getFiles(name);
+		files = fileTraverse.getFiles(name);
 		
 		// creates an input stream for the file to be parsed
         FileInputStream in;
@@ -85,15 +85,10 @@ public class App
 					String ff = f.getVariables().get(0).getName().toString();
 					fields2.put(ff, entry.getValue());			
 				}
-				
-				
+								
 				HashMap<MethodCallExpr,String> methods = new HashMap<>();
 				List<MethodCallExpr> methodCalls = Navigator.findAllNodesOfGivenClass(cu, MethodCallExpr.class);
 				methodCalls.forEach(mc-> methods.put(mc, JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature()));
-				
-				//for (Entry<MethodCallExpr,String> entry : methods.entrySet()) {
-				//	System.out.println("Method: " + entry.getKey()+" Method Type: "+entry.getValue());
-				//}
 				
 		        //libraries contains the external entities
 				List<ImportDeclaration> libraries = new ArrayList<>();
@@ -124,17 +119,11 @@ public class App
 						methodCalls2.forEach(mc-> methods2.put(st , new SimpleEntry(entry.getKey(),JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature())));
 					}
 				}
-				
-				//for(Entry<Statement,Entry<SimpleName,String>> entry : methods2.entrySet()) {
-				//	System.out.println("The statement: " + entry.getKey() + " contains the following information:");
-				//	Entry<SimpleName,String> help = entry.getValue();
-				//    System.out.println("Belongs to: " + help.getKey() + " and has type: " + help.getValue());
-			//	}
 		        
 		        //now i need to get flows
 				System.out.println("info for: " + s);
-				DataFlowExtractor dfe = new DataFlowExtractor();
-				dfe.methodFlows(methodStmnt, libraries, methods2, fields2);		      
+				DataFlowExtractor dataFlow = new DataFlowExtractor();
+				dataFlow.methodFlows(methodStmnt, libraries, methods2, fields2);		      
 			}
 
 		} catch (FileNotFoundException e) {
