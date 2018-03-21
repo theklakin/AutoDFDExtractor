@@ -121,9 +121,11 @@ public class App
 				}
 		        
 		        //now i need to get flows
-				System.out.println("info for: " + s);
+				//System.out.println("info for: " + s);
 				DataFlowExtractor dataFlow = new DataFlowExtractor();
-				dataFlow.methodFlows(methodStmnt, libraries, methods2, fields2);		      
+				HashMap< Entry<String,String>, String> flows = new HashMap<>();
+				flows = dataFlow.methodFlows(methodStmnt, libraries, methods2, fields2);
+				output.writeOutput(pack, libraries, fields2, flows, fileName);
 			}
 
 		} catch (FileNotFoundException e) {

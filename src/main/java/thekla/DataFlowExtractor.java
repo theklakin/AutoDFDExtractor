@@ -7,17 +7,16 @@ import java.util.Map.Entry;
 import java.util.AbstractMap.SimpleEntry;
 
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.symbolsolver.javaparser.Navigator;
-import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 public class DataFlowExtractor {
 
-	public void methodFlows(HashMap<SimpleName, List<Statement>> methodStmnt, List<ImportDeclaration> libraries, HashMap<Statement,Entry<SimpleName,String>> methods, HashMap<String, String> fields) {
-		HashMap<Statement,Boolean> statementExistance = new HashMap<>();
-		HashMap<String, Entry<String,String>> flows = new HashMap<>();
+	public HashMap< Entry<String,String>, String> methodFlows(HashMap<SimpleName, List<Statement>> methodStmnt, List<ImportDeclaration> libraries, HashMap<Statement,Entry<SimpleName,String>> methods, HashMap<String, String> fields) {
+		//HashMap<Statement,Boolean> statementExistance = new HashMap<>();
+		HashMap< Entry<String,String>, String> flows = new HashMap<>();
 		//= Name of the flow, Between Components
 
 		for (Entry<SimpleName, List<Statement>> entry : methodStmnt.entrySet()) {
@@ -29,11 +28,11 @@ public class DataFlowExtractor {
 			 */
 			
 			//we inspect each method individually
-			System.out.println("Info for: " + entry.getKey()); 
+			//System.out.println("Info for: " + entry.getKey()); 
 			HashMap<String,String> localAlias = new HashMap<>();
 			List<String> localNonSensitive = new ArrayList<>();
 			
-			for(Statement st : entry.getValue()) {					
+			for(Statement st : entry.getValue()) {		
 				if(st.isExpressionStmt()) {
 					boolean flag = false;
 					String state = st.toString();
@@ -41,9 +40,9 @@ public class DataFlowExtractor {
 						String[] stateParts = state.split("=");
 						String alias = stateParts[0];
 						String assignment = stateParts[1];
-												
-						String aliasedField = "";
 						
+						String aliasedField = "";
+																	
 						String containedField = getContainedField(assignment, fields);
 						if(containedField!="") {
 							aliasedField = containedField;
@@ -73,10 +72,10 @@ public class DataFlowExtractor {
 						}
 					}
 					
-					System.out.println("For this iteration we have:");
-					for(Entry<String,String> en : localAlias.entrySet()) {
-						System.out.println(en.getKey() + " " +en.getValue());
-					}
+					//System.out.println("aliasedField: " + aliasedField);
+					//for(Entry<String,String> en : localAlias.entrySet()) {
+					//	System.out.println(en.getKey() + " " +en.getValue());
+					//}
 				}
 								
 				String hasType = checkStatement(entry.getKey(), st, methods);
@@ -85,25 +84,37 @@ public class DataFlowExtractor {
 					String[] typeParts = hasType.split("\\.");
 					String entity = belongsTo(typeParts, libraries);
 					//System.out.println("Possible Entity for type: " + hasType + " is: " + entity);
-					flows.put(hasType, new SimpleEntry(entry.getKey().toString(), entity));
+					String flowName = getFlowName(st, localAlias);
+					if(flowName != "") {
+						//System.out.println("Statement: " + st + " has type: " + hasType);
+						flows.put(new SimpleEntry(entry.getKey().toString(), entity), flowName);
+					}
 				}
 				//statementExistance.put(st, exists);
 				//System.out.println(st + " has value: " + exists);
 			}		
 		}	
 		
-		for (Entry<String, Entry<String,String>> entry : flows.entrySet()) {
-			Entry<String,String> inside = entry.getValue();
-			System.out.println("There is a flow between: " + inside.getKey() + " and: " + inside.getValue() + " with the name: " + entry.getKey());
-			
-		}
+		return flows;
+	}
+	
+	public String getFlowName(Statement state, HashMap<String,String> localAlias) {
+		String flowName = "";
+		String stringState = state.toString();
+		for(Entry<String,String> entry : localAlias.entrySet()) {
+			if(stringState.contains(entry.getValue()) || stringState.contains(entry.getKey())){
+				flowName = entry.getValue();
+				break;
+			}
+		}		
+		return flowName;		
 	}
 	
 	public String belongsTo(String[] type, List<ImportDeclaration> libraries) {
 		String entity = "";	
 		List<String> possible = new ArrayList<>();
 		for(ImportDeclaration id : libraries) {		
-			String lib = id.toString();
+			String lib = id.getNameAsString();
 			if(lib.contains(type[0])) {
 				possible.add(lib);
 			}
@@ -163,5 +174,14 @@ public class DataFlowExtractor {
 			}
 		}		
 		return type;
+	}
+	
+	private static class MethodNameCollector extends VoidVisitorAdapter<Void> {
+		
+		@Override
+		public void visit(MethodDeclaration md, Void collector) {
+			super.visit(md, collector);
+			System.out.println(md.getParameters());
+		}
 	}
 }
