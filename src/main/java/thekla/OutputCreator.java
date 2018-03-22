@@ -15,7 +15,7 @@ import com.github.javaparser.ast.PackageDeclaration;
 
 public class OutputCreator {
 	
-	//this class is used to fix the inputs given to each list
+	//private int index = 0;
 	
 	//constructor
 	OutputCreator(){
@@ -23,6 +23,7 @@ public class OutputCreator {
 	}
 	
 	public String createOutputFile(String input) {
+		//index++;
 		String[] temp = input.split("\\\\");
 		String output = temp[temp.length-1];
 		return output;
@@ -50,7 +51,14 @@ public class OutputCreator {
 			bw.println();
 			for (Entry<Entry<String,String>, String> entry : flows.entrySet()) {
 				Entry<String,String> inside = entry.getKey();
-				bw.println("There is a flow between: " + inside.getKey() + " and: " + inside.getValue() + " with the name: " + entry.getValue());				
+				String direction = "";
+				String t = inside.getValue();
+				if(t.contains("from")) {
+					direction = "to";
+				}else {
+					direction = "from";
+				}
+				bw.println("There is a flow " + direction + " " + inside.getKey() + " " + inside.getValue() + " with the name: " + entry.getValue());				
 			}
 			bw.println();
 			bw.close();

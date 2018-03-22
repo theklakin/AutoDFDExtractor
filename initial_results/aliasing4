@@ -1,0 +1,21 @@
+The following information is about securibench.micro.aliasing
+
+The external entities are: 
+
+java.io.IOException
+java.io.PrintWriter
+javax.servlet.http.HttpServletRequest
+javax.servlet.http.HttpServletResponse
+securibench.micro.BasicTestCase
+securibench.micro.MicroTestCase
+
+The fields are: 
+
+FIELD_NAME with type: java.lang.String
+
+The flows are: 
+
+There is a flow between: doGet and: javax.servlet.http.HttpServletRequest with the name: FIELD_NAME
+There is a flow between: doGet and:  with the name: FIELD_NAME
+There is a flow between: doGet and: java.io.PrintWriter with the name: FIELD_NAME
+

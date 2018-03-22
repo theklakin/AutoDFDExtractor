@@ -83,11 +83,18 @@ public class DataFlowExtractor {
 					//it is a method call
 					String[] typeParts = hasType.split("\\.");
 					String entity = belongsTo(typeParts, libraries);
+					String temp = st.toString();
+					String entity2 = "";
+					if(temp.contains("=")) {
+						entity2 = "from " + entity;
+					}else {
+						entity2 = "to " + entity;
+					}
 					//System.out.println("Possible Entity for type: " + hasType + " is: " + entity);
 					String flowName = getFlowName(st, localAlias);
 					if(flowName != "") {
 						//System.out.println("Statement: " + st + " has type: " + hasType);
-						flows.put(new SimpleEntry(entry.getKey().toString(), entity), flowName);
+						flows.put(new SimpleEntry(entry.getKey().toString(), entity2), flowName);
 					}
 				}
 				//statementExistance.put(st, exists);

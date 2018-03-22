@@ -18,5 +18,7 @@
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/javax.servlet.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/org.json.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/java-json.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/json-simple-1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/gson-2.2.4-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
