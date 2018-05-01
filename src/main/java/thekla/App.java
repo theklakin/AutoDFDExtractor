@@ -20,7 +20,6 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.SimpleName;
-import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
@@ -42,6 +41,9 @@ public class App
 		//and read his/her input
 		Scanner scanner = new Scanner (System.in);
 		String name = scanner.next();	
+		System.out.println("Please insert the path to the src file dependency.");
+		//scanner = new Scanner (System.in);
+		//String dependency = scanner.next();	
 		scanner.close();
 		//create a file that keeps all the relevant information
         OutputCreator output = new OutputCreator();
@@ -55,20 +57,25 @@ public class App
 		// creates an input stream for the file to be parsed
         FileInputStream in;
 		//InputStream in = null;
+        List<ImportDeclaration> libraries = null;
         
 		try {
-			for(String s : files) {				
+			for(String s : files) {
+				//System.out.println("Info for file: " +s);
 				CombinedTypeSolver typeSolver = new CombinedTypeSolver();
 				typeSolver.add(new ReflectionTypeSolver());	
-				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\OnlineProjectEvaluator-CODE\\src\\")));
+				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
+				//typeSolver.add(new JavaParserTypeSolver(new File(name)));
 				
 				in = new FileInputStream(s);
 		        // parse the file
 		        CompilationUnit cu = JavaParser.parse(in);
 		        
 		        //this will return the name of the methods that exist in that source file
-				HashMap<SimpleName, BlockStmt> methodNames = new HashMap<>();
-				VoidVisitor<HashMap<SimpleName, BlockStmt>> methodNameCollector = new MethodNameCollector();
+				List<SimpleName> methodNames = new ArrayList<>();
+				VoidVisitor<List<SimpleName>> methodNameCollector = new MethodNameCollector();
 				methodNameCollector.visit(cu, methodNames);
 				
 				//this will find all the persistent storages
@@ -76,28 +83,34 @@ public class App
 				List<FieldDeclaration> fd = Navigator.findAllNodesOfGivenClass(cu, FieldDeclaration.class);
 				for(FieldDeclaration f : fd) {
 					ResolvedType fit = JavaParserFacade.get(typeSolver).convertToUsage(f.getVariables().get(0).getType(), f);
-					fields.put(f, fit.asReferenceType().getQualifiedName());
+					if(f.hasComment()) {
+						f.removeComment();
+					}
+					if(fit.isPrimitive()) {
+						fields.put(f, fit.describe());
+					}else {
+						fields.put(f, fit.asReferenceType().getQualifiedName());
+					}
 				}
-								
-				HashMap<String, String> fields2 = new HashMap<>();
+				
+				//for(Entry<FieldDeclaration, String> entry : fields.entrySet()) {
+				//	System.out.println("The " + entry.getKey() + " has type: " + entry.getValue());
+				//}
+				
+				HashMap<String, String> fields2 = new HashMap<>();				
 				for (Entry<FieldDeclaration, String> entry : fields.entrySet()) {
 					FieldDeclaration f = entry.getKey();
 					String ff = f.getVariables().get(0).getName().toString();
 					fields2.put(ff, entry.getValue());			
 				}
-								
-				HashMap<MethodCallExpr,String> methods = new HashMap<>();
-				List<MethodCallExpr> methodCalls = Navigator.findAllNodesOfGivenClass(cu, MethodCallExpr.class);
-				methodCalls.forEach(mc-> methods.put(mc, JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature()));
 				
 		        //libraries contains the external entities
-				List<ImportDeclaration> libraries = new ArrayList<>();
+				libraries = new ArrayList<>();
 		        libraries = cu.getImports(); 
-		        
-				//HashMap<SimpleName,FieldDeclaration> storageFlows = new HashMap<>();
-		        
+		        		        
 		        //returns the package
 		        Optional<PackageDeclaration> pack = cu.getPackageDeclaration();
+		        
 		        HashMap<SimpleName, List<Statement>> methodStmnt = new HashMap<>();
 		        List<TypeDeclaration<?>> field = cu.getTypes();	        
 		        for(TypeDeclaration<?> td : field) {
@@ -105,41 +118,61 @@ public class App
 		        	List<MethodDeclaration> tempMethod = td.getMethods();
 		        	for(MethodDeclaration tdm : tempMethod) {	
 		        		//get name of method as well as the method statements
-		        		List<Statement> methodStatement =  tdm.getBody().get().getStatements();
-		        		methodStmnt.put(tdm.getName(), methodStatement);
+		        		List<Statement> parentStatement =  Navigator.findAllNodesOfGivenClass(tdm, Statement.class);
+		        		List<Statement> finalStatement = new ArrayList<>();
+		        		
+						for(Statement st : parentStatement) {
+							if(st.isExpressionStmt()) {
+								if(st.hasComment()) {
+									st.removeComment();
+								}
+								finalStatement.add(st);
+							}
+						}
+		        		methodStmnt.put(tdm.getName(), finalStatement);
 		        	}
 		        }
 		        
-				HashMap<Statement,Entry<SimpleName,String>> methods2 = new HashMap<>();
+				HashMap<Entry<SimpleName,String>,Statement> methods = new HashMap<>();
+		        //HashMap<SimpleName,HashMap<Statement,String>> methods = new HashMap<>();
 
 				for (Entry<SimpleName, List<Statement>> entry : methodStmnt.entrySet()) {
-					//System.out.println("Method: " + entry.getKey()+" Has the following statements: ");
+					//HashMap<Statement,String> mCallsPerMethod = new HashMap<>();
+					//System.out.println("Method: " +entry.getKey());
 					for(Statement st : entry.getValue()) {
-						List<MethodCallExpr> methodCalls2 = Navigator.findAllNodesOfGivenClass(st, MethodCallExpr.class);
-						methodCalls2.forEach(mc-> methods2.put(st , new SimpleEntry(entry.getKey(),JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature())));
+						List<MethodCallExpr> methodCalls = Navigator.findAllNodesOfGivenClass(st, MethodCallExpr.class);
+						//methodCalls.forEach(mc->System.out.println("Statement: " +st + " has type: " + JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature()));
+						//methodCalls.forEach(mc-> mCallsPerMethod.put(st,JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature()));
+						methodCalls.forEach(mc-> methods.put(new SimpleEntry(entry.getKey(),JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature()),st));
 					}
+					//methods.put(entry.getKey(), mCallsPerMethod);
 				}
-		        
+				
 		        //now i need to get flows
-				//System.out.println("info for: " + s);
 				DataFlowExtractor dataFlow = new DataFlowExtractor();
 				HashMap< Entry<String,String>, String> flows = new HashMap<>();
-				flows = dataFlow.methodFlows(methodStmnt, libraries, methods2, fields2);
-				output.writeOutput(pack, libraries, fields2, flows, fileName);
+				//dataFlow.methodFlows(methodStmnt, libraries, methods, fields2, methodNames);
+				flows = dataFlow.methodFlows2(methodStmnt, libraries, methods, fields2, methodNames);
+				HashMap<String,String> dataStores = dataFlow.getDataStores();
+				output.writeOutput(pack, libraries, dataStores, flows, fileName,s);
 			}
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		DotFileCreator dotFileCreator = new DotFileCreator();
+		dotFileCreator.createVisualFile(fileName);
+		System.out.println("I have finished");
     }    
 	
-	private static class MethodNameCollector extends VoidVisitorAdapter<HashMap<SimpleName, BlockStmt>> {
+	private static class MethodNameCollector extends VoidVisitorAdapter<List<SimpleName>> {
 		
 		@Override
-		public void visit(MethodDeclaration md, HashMap<SimpleName, BlockStmt> collector) {
+		public void visit(MethodDeclaration md, List<SimpleName> collector) {
 			super.visit(md, collector);
-			BlockStmt body = md.getBody().get();
-			collector.put(md.getName(), body);
+			//BlockStmt body = md.getBody().get();
+			collector.add(md.getName());
 		}
 	}
+	
 }
