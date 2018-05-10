@@ -58,15 +58,16 @@ public class App
         FileInputStream in;
 		//InputStream in = null;
         List<ImportDeclaration> libraries = null;
+        List<Optional<PackageDeclaration>> packages = new ArrayList<>();
+        List<SimpleName> allMethodNames = new ArrayList<>();
         
 		try {
 			for(String s : files) {
-				//System.out.println("Info for file: " +s);
 				CombinedTypeSolver typeSolver = new CombinedTypeSolver();
 				typeSolver.add(new ReflectionTypeSolver());	
-				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
+				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\OnlineProjectEvaluator-CODE\\src\\")));
-				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File(name)));
 				
 				in = new FileInputStream(s);
@@ -77,6 +78,7 @@ public class App
 				List<SimpleName> methodNames = new ArrayList<>();
 				VoidVisitor<List<SimpleName>> methodNameCollector = new MethodNameCollector();
 				methodNameCollector.visit(cu, methodNames);
+				allMethodNames.addAll(methodNames);
 				
 				//this will find all the persistent storages
 				HashMap<FieldDeclaration, String> fields = new HashMap<>();
@@ -93,10 +95,6 @@ public class App
 					}
 				}
 				
-				//for(Entry<FieldDeclaration, String> entry : fields.entrySet()) {
-				//	System.out.println("The " + entry.getKey() + " has type: " + entry.getValue());
-				//}
-				
 				HashMap<String, String> fields2 = new HashMap<>();				
 				for (Entry<FieldDeclaration, String> entry : fields.entrySet()) {
 					FieldDeclaration f = entry.getKey();
@@ -104,12 +102,14 @@ public class App
 					fields2.put(ff, entry.getValue());			
 				}
 				
+				
 		        //libraries contains the external entities
 				libraries = new ArrayList<>();
 		        libraries = cu.getImports(); 
 		        		        
 		        //returns the package
 		        Optional<PackageDeclaration> pack = cu.getPackageDeclaration();
+		        packages.add(pack);
 		        
 		        HashMap<SimpleName, List<Statement>> methodStmnt = new HashMap<>();
 		        List<TypeDeclaration<?>> field = cu.getTypes();	        
@@ -151,7 +151,6 @@ public class App
 		        //now i need to get flows
 				DataFlowExtractor dataFlow = new DataFlowExtractor();
 				HashMap< Entry<String,String>, String> flows = new HashMap<>();
-				//dataFlow.methodFlows(methodStmnt, libraries, methods, fields2, methodNames);
 				flows = dataFlow.methodFlows2(methodStmnt, libraries, methods, fields2, methodNames);
 				HashMap<String,String> dataStores = dataFlow.getDataStores();
 				output.writeOutput(pack, libraries, dataStores, flows, fileName,s);
@@ -161,6 +160,8 @@ public class App
 			e.printStackTrace();
 		}
 		DotFileCreator dotFileCreator = new DotFileCreator();
+		EntireDFDExtractor dfd = new EntireDFDExtractor();
+		dfd.extractDFD(allMethodNames, packages,fileName);
 		dotFileCreator.createVisualFile(fileName);
 		System.out.println("I have finished");
     }    

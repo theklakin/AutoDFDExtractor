@@ -13,15 +13,9 @@ import com.github.javaparser.ast.stmt.Statement;
 public class DataFlowExtractor {
 	
 	private HashMap<String,String> dataStores;
-	//private List<String> localStores;
-	//private HashMap<String,String> inputs;
-	//HashMap< Entry<String,String>, String> flows;
 	
 	DataFlowExtractor(){
 		dataStores = new HashMap<>();
-		//localStores = new ArrayList<>();
-		//inputs = new HashMap<>();
-		//System.out.println("Object DataFlowExtractor is created");
 	}
 	
 	public HashMap<String,String> getDataStores() {
@@ -36,6 +30,11 @@ public class DataFlowExtractor {
 		
 		for(Entry<SimpleName,List<Statement>> entry : methodStmnt.entrySet()) {
 			List<String> inputs = new ArrayList<>();
+			if(!fields.isEmpty()) {
+				for(Entry<String,String> f : fields.entrySet()) {
+					inputs.add(f.getKey());
+				}
+			}
 			SimpleName methodName = entry.getKey();
 			HashMap<Statement,String> methodCalls = new HashMap<>();
 			for(Entry<SimpleName,HashMap<Statement,String>> temp : orderedMethodCalls.entrySet()) {

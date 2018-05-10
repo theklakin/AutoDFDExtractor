@@ -24,6 +24,7 @@ public class DotFileCreator {
 	}
 	
 	public void createVisualFile(String file) {
+		//System.out.println(file);
 		HashMap<Integer,Entry<String,String>> visual = new HashMap<>();
 		List<String> externalEntities = new ArrayList<>();
 		BufferedReader br = null;
@@ -39,10 +40,10 @@ public class DotFileCreator {
 
 			while ((sCurrentLine = br.readLine()) != null) {
 				//if i reached that line then I found the flows
-				if(sCurrentLine.contains("The external entities are:")) {
+				if(sCurrentLine.contains("The External Entities are:")) {
 					externalEntityFlag = true;
 				}
-				if(sCurrentLine.contains("The fields are:")) {
+				if(sCurrentLine.contains("The Data Stores are:")) {
 					externalEntityFlag = false;
 				}
 				
