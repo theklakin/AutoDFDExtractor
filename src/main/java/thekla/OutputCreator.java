@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +35,7 @@ public class OutputCreator {
 			bw.println("The external entities are: ");
 			bw.println();
 			for(ImportDeclaration si : libraries) {
-				bw.println(si.getName());
+				bw.println(si.getNameAsString());
 			}			
 			bw.println();
 			bw.println("The fields are: ");

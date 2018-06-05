@@ -3,7 +3,6 @@ package thekla;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,17 +14,6 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.PackageDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.SimpleName;
-import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.ast.visitor.VoidVisitor;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.symbolsolver.javaparser.Navigator;
-import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
@@ -41,10 +29,10 @@ public class App
 		//and read his/her input
 		Scanner scanner = new Scanner (System.in);
 		String name = scanner.next();	
-		System.out.println("Please insert the path to the src file dependency.");
+		//System.out.println("Please insert the path to the src file dependency.");
 		//scanner = new Scanner (System.in);
 		//String dependency = scanner.next();	
-		scanner.close();
+		//scanner.close();
 		//create a file that keeps all the relevant information
         OutputCreator output = new OutputCreator();
 		FileTraversal fileTraverse = new FileTraversal();
@@ -57,9 +45,12 @@ public class App
 		// creates an input stream for the file to be parsed
         FileInputStream in;
 		//InputStream in = null;
-        List<ImportDeclaration> libraries = null;
-        List<Optional<PackageDeclaration>> packages = new ArrayList<>();
-        List<SimpleName> allMethodNames = new ArrayList<>();
+        //List<ImportDeclaration> libraries = null;
+        //List<Optional<PackageDeclaration>> packages = new ArrayList<>();
+       // HashMap<SimpleName,List<Parameter>> allMethodNames = new HashMap<>();
+        InfoExtractor info = new InfoExtractor();
+        HashMap<Entry<String,String>, Entry<String, String>> methodCallTrace = new HashMap<>();
+        HashMap<String,HashMap<String,String>> alias = new HashMap<>();
         
 		try {
 			for(String s : files) {
@@ -67,113 +58,69 @@ public class App
 				typeSolver.add(new ReflectionTypeSolver());	
 				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\OnlineProjectEvaluator-CODE\\src\\")));
-				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
+				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File(name)));
 				
 				in = new FileInputStream(s);
 		        // parse the file
 		        CompilationUnit cu = JavaParser.parse(in);
 		        
-		        //this will return the name of the methods that exist in that source file
-				List<SimpleName> methodNames = new ArrayList<>();
-				VoidVisitor<List<SimpleName>> methodNameCollector = new MethodNameCollector();
-				methodNameCollector.visit(cu, methodNames);
-				allMethodNames.addAll(methodNames);
-				
-				//this will find all the persistent storages
-				HashMap<FieldDeclaration, String> fields = new HashMap<>();
-				List<FieldDeclaration> fd = Navigator.findAllNodesOfGivenClass(cu, FieldDeclaration.class);
-				for(FieldDeclaration f : fd) {
-					ResolvedType fit = JavaParserFacade.get(typeSolver).convertToUsage(f.getVariables().get(0).getType(), f);
-					if(f.hasComment()) {
-						f.removeComment();
-					}
-					if(fit.isPrimitive()) {
-						fields.put(f, fit.describe());
-					}else {
-						fields.put(f, fit.asReferenceType().getQualifiedName());
-					}
-				}
-				
-				HashMap<String, String> fields2 = new HashMap<>();				
-				for (Entry<FieldDeclaration, String> entry : fields.entrySet()) {
-					FieldDeclaration f = entry.getKey();
-					String ff = f.getVariables().get(0).getName().toString();
-					fields2.put(ff, entry.getValue());			
-				}
-				
-				
-		        //libraries contains the external entities
-				libraries = new ArrayList<>();
-		        libraries = cu.getImports(); 
-		        		        
-		        //returns the package
-		        Optional<PackageDeclaration> pack = cu.getPackageDeclaration();
-		        packages.add(pack);
+		        String[] fileParts = s.split("\\\\");
+		        String[] fname = fileParts[fileParts.length-1].split("\\.");
+		        //String fileN = fname[0];
 		        
-		        HashMap<SimpleName, List<Statement>> methodStmnt = new HashMap<>();
-		        List<TypeDeclaration<?>> field = cu.getTypes();	        
-		        for(TypeDeclaration<?> td : field) {
-		        	//this is to return all the method calls of a method, i.e. what flows it uses
-		        	List<MethodDeclaration> tempMethod = td.getMethods();
-		        	for(MethodDeclaration tdm : tempMethod) {	
-		        		//get name of method as well as the method statements
-		        		List<Statement> parentStatement =  Navigator.findAllNodesOfGivenClass(tdm, Statement.class);
-		        		List<Statement> finalStatement = new ArrayList<>();
-		        		
-						for(Statement st : parentStatement) {
-							if(st.isExpressionStmt()) {
-								if(st.hasComment()) {
-									st.removeComment();
-								}
-								finalStatement.add(st);
-							}
-						}
-		        		methodStmnt.put(tdm.getName(), finalStatement);
-		        	}
-		        }
-		        
-				HashMap<Entry<SimpleName,String>,Statement> methods = new HashMap<>();
-		        //HashMap<SimpleName,HashMap<Statement,String>> methods = new HashMap<>();
-
-				for (Entry<SimpleName, List<Statement>> entry : methodStmnt.entrySet()) {
-					//HashMap<Statement,String> mCallsPerMethod = new HashMap<>();
-					//System.out.println("Method: " +entry.getKey());
-					for(Statement st : entry.getValue()) {
-						List<MethodCallExpr> methodCalls = Navigator.findAllNodesOfGivenClass(st, MethodCallExpr.class);
-						//methodCalls.forEach(mc->System.out.println("Statement: " +st + " has type: " + JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature()));
-						//methodCalls.forEach(mc-> mCallsPerMethod.put(st,JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature()));
-						methodCalls.forEach(mc-> methods.put(new SimpleEntry(entry.getKey(),JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature()),st));
-					}
-					//methods.put(entry.getKey(), mCallsPerMethod);
-				}
+		        info.information(cu, typeSolver);
+		        //String f = "Info" + fileN;
+		        List<DFD> allDFDInfo = info.getDFDs();		    
 				
 		        //now i need to get flows
-				DataFlowExtractor dataFlow = new DataFlowExtractor();
+				DataFlowExtractor dataFlow = new DataFlowExtractor(allDFDInfo,s);
 				HashMap< Entry<String,String>, String> flows = new HashMap<>();
-				flows = dataFlow.methodFlows2(methodStmnt, libraries, methods, fields2, methodNames);
+				flows = dataFlow.parseDFDInfo();
+				//flows = dataFlow.parseInfoFile(f);
+				//flows = dataFlow.methodFlows2(methodStmnt, libraries, methods, fields2, methodNames);
 				HashMap<String,String> dataStores = dataFlow.getDataStores();
+				Optional<PackageDeclaration> pack = info.getPackage();
+				methodCallTrace = dataFlow.getTrace();
+				
+				/*for(Entry<Entry<String,String>,Entry<String,String>> entry : methodCallTrace.entrySet()) {
+					Entry<String,String> meth = entry.getKey();
+					Entry<String,String> al = entry.getValue();
+					System.out.println("Method " + meth.getKey() + " calls method " + meth.getValue());
+					System.out.println("with parameter " + al.getKey() + " aliasing " + al.getValue());
+				}*/
+
+				alias = dataFlow.getAllAlias();
+				/*for(Entry<String, HashMap<String, String>> aliasEntry : alias.entrySet()) {
+					System.out.println("Method: " + aliasEntry.getKey() + " has the following info about alias.");
+					HashMap<String, String> temp = aliasEntry.getValue();
+					for(Entry<String,String> tempE : temp.entrySet()) {
+						System.out.println("The " + tempE.getValue() + " has alias: " + tempE.getKey());
+					}
+				}*/
+				List<ImportDeclaration> libraries = dataFlow.getExternalEntities();
 				output.writeOutput(pack, libraries, dataStores, flows, fileName,s);
 			}
-
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		String subfile = "sub" + fileName;
 		DotFileCreator dotFileCreator = new DotFileCreator();
-		EntireDFDExtractor dfd = new EntireDFDExtractor();
-		dfd.extractDFD(allMethodNames, packages,fileName);
-		dotFileCreator.createVisualFile(fileName);
+		//EntireDFDExtractor dfd = new EntireDFDExtractor();
+		//dfd.extractDFD(allMethodNames, packages,fileName);
+		dotFileCreator.createVisualFile(subfile);
 		System.out.println("I have finished");
-    }    
-	
-	private static class MethodNameCollector extends VoidVisitorAdapter<List<SimpleName>> {
-		
-		@Override
-		public void visit(MethodDeclaration md, List<SimpleName> collector) {
-			super.visit(md, collector);
-			//BlockStmt body = md.getBody().get();
-			collector.add(md.getName());
+		//String variable = "";
+		fileName = "sub" + fileName;
+		System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
+		//scanner = new Scanner (System.in);
+		String variable = scanner.next();
+		while(!variable.equals("No")) {		
+				SpecificDFD specDFD = new SpecificDFD(fileName, variable, methodCallTrace, alias);
+				specDFD.creteSpecificDFD();
+				System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
+				variable = scanner.next();
 		}
-	}
-	
+		scanner.close();
+    }    
 }

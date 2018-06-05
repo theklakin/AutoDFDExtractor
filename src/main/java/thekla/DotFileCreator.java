@@ -40,10 +40,10 @@ public class DotFileCreator {
 
 			while ((sCurrentLine = br.readLine()) != null) {
 				//if i reached that line then I found the flows
-				if(sCurrentLine.contains("The External Entities are:")) {
+				if(sCurrentLine.contains("The external entities are:")) {
 					externalEntityFlag = true;
 				}
-				if(sCurrentLine.contains("The Data Stores are:")) {
+				if(sCurrentLine.contains("The fields are:")) {
 					externalEntityFlag = false;
 				}
 				
@@ -72,22 +72,22 @@ public class DotFileCreator {
 							}
 						}
 						//System.out.println("from: " + from + " to " + to);
-						from = check(from);
-						to = check(to);
+						String from2 = check(from);
+						String to2 = check(to);
 						name = chackName(name);
 						
 						String shape = getShape(from, externalEntities);
 						if(!shape.equals("")) {
-							shapes.put(from, shape);
+							shapes.put(from2, shape);
 						}
 						shape = getShape(to, externalEntities);
 						if(!shape.equals("")) {
-							shapes.put(to, shape);
+							shapes.put(to2, shape);
 						}
 						
-						from = from + " ->";
-						to = to + " [label=\"" + name +"\"];";
-						visual.put(index, new SimpleEntry(from, to));
+						from2 = from2 + " ->";
+						to2 = to2 + " [label=\"" + name +"\"];";
+						visual.put(index, new SimpleEntry(from2, to2));
 						index++;
 					}
 				}
@@ -114,9 +114,27 @@ public class DotFileCreator {
 			
 			v.println("}");
 			v.close();
+			createImage(fileName, file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void createImage(String file, String name) {
+		//the command that is going to be given to cmd
+		String dfdName = name + ".jpeg";
+		String command = "dot -Tjpeg " + file + " -o " + dfdName;
+		
+		//put it in the cmd
+		ProcessBuilder builder = new ProcessBuilder("cmd.exe","/c",command);
+		builder.redirectErrorStream(true);
+		
+		try{
+			//Process p = 
+			builder.start();
+		}catch(IOException e){
+			System.out.println(e.getMessage());
+		}	
 	}
 	
 	public String chackName(String name) {
@@ -132,6 +150,7 @@ public class DotFileCreator {
 	public String check(String name) {
 		String newName = name;
 		
+		/*
 		if(name.contains(".")) {
 			if(name.contains("logging")) {
 				newName = "log";
@@ -139,6 +158,10 @@ public class DotFileCreator {
 				String[] nameParts = name.split("\\.");
 				newName = nameParts[nameParts.length-1];
 			}
+		}*/
+		
+		if(name.contains(".")) {
+			newName = name.replace(".", "_");
 		}
 		
 		return newName;

@@ -3,176 +3,214 @@ package thekla;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+
+import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.stmt.Statement;
+
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 
-import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.expr.SimpleName;
-import com.github.javaparser.ast.stmt.Statement;
 
 public class DataFlowExtractor {
 	
+	private List<DFD> allDFDInfo = new ArrayList<>();
 	private HashMap<String,String> dataStores;
+	private List<ImportDeclaration> externalEntities;
+	private List<String> methodNames;
+	private HashMap<Entry<String,String>, Entry<String,String>> methodCallTrace;
+	private HashMap<String,HashMap<String,String>> allAlias;
+	private HashMap<String,String> methodAlias;
+	private String description;
 	
-	DataFlowExtractor(){
+	DataFlowExtractor(List<DFD> allDFDInfo, String s){
+		this.allDFDInfo = allDFDInfo;
 		dataStores = new HashMap<>();
+		externalEntities = allDFDInfo.get(0).getLibraries();
+		methodNames = new ArrayList<>();
+		methodCallTrace = new HashMap<>();
+		allAlias = new HashMap<>();
+		String[] temp = s.split("\\\\");
+		String[] temp2 = temp[temp.length-1].split("\\.");
+		description = temp2[0];
+		
+		for(DFD dfd : allDFDInfo) {
+			methodNames.add(dfd.getMethodName());
+		}
 	}
 	
 	public HashMap<String,String> getDataStores() {
 		return dataStores;
 	}
 	
-	public HashMap< Entry<String,String>, String> methodFlows2(HashMap<SimpleName, List<Statement>> methodStmnt, List<ImportDeclaration> libraries, HashMap<Entry<SimpleName,String>,Statement> methods, HashMap<String, String> fields, List<SimpleName> methodNames) {
-		HashMap< Entry<String,String>, String> flows = new HashMap<>();
-		HashMap< Entry<String,String>, String> finalFlows = new HashMap<>();
-		HashMap<SimpleName,HashMap<Statement,String>> orderedMethodCalls = orderMethodCalls(methodNames, methods);
-		//printInfo(methods);
+	public HashMap<String,HashMap<String,String>> getAllAlias(){
+		return allAlias;
+	}
+	
+	public HashMap<Entry<String,String>, Entry<String,String>> getTrace() {
+		return methodCallTrace;
+	}
+	
+	public List<ImportDeclaration> getExternalEntities() {
+		return externalEntities;
+	}
+	
+	public List<String> getAllMethodNames() {
+		return methodNames;
+	}
 		
-		for(Entry<SimpleName,List<Statement>> entry : methodStmnt.entrySet()) {
+	public HashMap<Entry<String,String>, String> parseDFDInfo() {
+		HashMap<Entry<String,String>, String> flows = new HashMap<>();
+		
+		for(DFD dfd : allDFDInfo) {
 			List<String> inputs = new ArrayList<>();
-			if(!fields.isEmpty()) {
-				for(Entry<String,String> f : fields.entrySet()) {
-					inputs.add(f.getKey());
-				}
-			}
-			SimpleName methodName = entry.getKey();
+			List<Statement> methodStatements = new ArrayList<>();
 			HashMap<Statement,String> methodCalls = new HashMap<>();
-			for(Entry<SimpleName,HashMap<Statement,String>> temp : orderedMethodCalls.entrySet()) {
-				SimpleName name = temp.getKey();
-				if(name.equals(methodName)) {
-					methodCalls.putAll(temp.getValue());
-					break;
-				}
-			}
-			//System.out.println("Inputs");
-			//for(String s : inputs) {
-			//	System.out.println("input: " +s);
-			//}
 			
-			for(Statement statement : entry.getValue()) {
-				String type = checkStatement(statement, methodCalls);
-				
-				if(!type.equals("")) {
-					//System.out.println("Statement " + statement+ " Type: " + type);
-					String component = "";
-					String entity="";
-					boolean flag = false;
-					String st = statement.toString();
-					
-					String id = inspectType(type);
-					//System.out.println("Is an " + id);
-					
-					switch(id) {
-					case "Input" :
-						String[] inputParts = null;
-						if(st.contains("=")) {
-							inputParts = st.split("=");
-						} else {
-							inputParts = st.split("\\.");
-						}
+			inputs = dfd.getInputs();
+			methodStatements = dfd.getMethodStmnt();
+			methodCalls = dfd.getMethodCalls();			
+			String methodName = dfd.getMethodName();
 						
-						if(inputParts.length>1){
-							String[] tempS = inputParts[0].split(" ");
-							String localVar ="";
-							if(tempS.length>1) {
-								localVar=tempS[tempS.length-1];
-							}else {
-								localVar = tempS[0];
-							}
-							//System.out.println("alias " + localVar);
-							inputs.add(localVar);
-						} 
-						//component = belongsToMethod(type, methodNames);
-						//if(component.equals("")) {
-							component = belongsTo(type,libraries, methodNames);
-						//}
-						break;
-					case "Output" :
-						boolean contain = checkState(statement,inputs,fields);
-						String alias = inputAlias(statement, inputs);
-						if(!alias.equals("")) {
-							inputs.add(alias);
-						}
-						if(contain) {
-							//component = belongsToMethod(type, methodNames);
-							//if(component.equals("")) {
-								component = belongsTo(type,libraries, methodNames);
-							//}
-						}
-						break;
-					default : 
-						System.out.println("Default state");
-					}
-															
-					if(st.contains("=") && !type.contains("sql")) {
-						flag=true;
-					}
+			flows.putAll(methodFlows(methodName, inputs, methodStatements, methodCalls));
+		}	
+		return flows;	
+	}
+	
+	public void printFounInfo(List<String> inputs, List<String> methodStatements, HashMap<String,String> methodCalls) {
+		//System.out.println("Libraries:");
+		//for(String s : externalEntities) {
+		//	System.out.println(s);
+		//}
+		
+		System.out.println("Inputs:");
+		for(String s : inputs) {
+			System.out.println(s);
+		}
+		
+		System.out.println("Statements:");
+		for(String s : methodStatements) {
+			System.out.println(s);
+		}
+		
+		System.out.println("Method Calls:");
+		for(Entry<String,String> entry : methodCalls.entrySet()) {
+			System.out.println("Statement: " + entry.getKey() + " has type: " + entry.getValue());
+		}
+	}
+	
+	public HashMap<Entry<String,String>, String> methodFlows(String methodName, List<String> inputs, List<Statement> methodStatements, HashMap<Statement,String> methodCalls) {
+		HashMap<Entry<String,String>, String> flows = new HashMap<>();
+		HashMap<Entry<String,String>, String> finalFlows = new HashMap<>();
+		methodAlias = new HashMap<>();
+		//System.out.println("Method: " + methodName);
+		//printFounInfo(inputs, methodStatements, methodCalls);
+		
+		for(Statement statement : methodStatements) {	
+			String state = statement.toString();
+			String type = checkStatement(state, methodCalls);
+			if(!type.equals("")) {
+				//System.out.println("Type=" +type);
+				traceMethod(state, type, methodName, inputs);
+				String component = "";
+				String entity="";
+				boolean flag = false;					
+				String id = inspectType(type);
 					
-					//System.out.println("Component: " +component);
-					
-					if(!component.equals("")) {
-						if(flag) {
-							entity = "from " + component;
-						} else entity = "to " + component;
-						String flowName = "";
+				switch(id) {
+				case "Input" :
+					String[] inputParts = null;
+					if(state.contains("=")) {
+						inputParts = state.split("=");
+					} else {
+						inputParts = state.split("\\.");
+					}
 						
-						if(id.equals("Input")) {
-							//flowName = st.replaceAll(" ", "");
-							flowName = st;
+					if(inputParts.length>1){
+						String[] tempS = inputParts[0].split(" ");
+						String localVar ="";
+						if(tempS.length>1) {
+							localVar=tempS[tempS.length-1];
 						}else {
-							//String help = statement.toString();
-							String[] stateParts = st.split("\\.");
-							flowName = stateParts[stateParts.length-1];
-							//System.out.println("Flow Name: " + flowName);
+							localVar = tempS[0];
 						}
-						if(!entity.equals("")) {
-							boolean flowFlag = inspectFlow(flowName);
-							if(flowFlag) {
-								//flowName = flowName.replaceAll(" ", "");
-								flows.put(new SimpleEntry(methodName.asString(), entity), flowName);
-							}						
-						}						
-					}									
-				}else {
-					String alias = inputAlias(statement, inputs);
+						inputs.add(localVar);
+					} 
+					component = belongsTo(type,externalEntities);
+					break;
+				case "Output" :
+					boolean contain = checkState(state,inputs);
+					String alias = inputAlias(state, inputs);
 					if(!alias.equals("")) {
 						inputs.add(alias);
 					}
+					if(contain) {
+						//component = belongsToMethod(statement, type, methodName);							
+						if(component.equals("")) {
+							component = belongsTo(type,externalEntities);
+						}
+					}
+					break;
+				default : 
+					System.out.println("Default state");
 				}
-			}			
-		}
-		
+															
+				if(state.contains("=") && !type.contains("sql")) {
+					flag=true;
+				}
+										
+				if(!component.equals("")) {
+					if(flag) {
+						entity = "from " + component;
+					} else entity = "to " + component;
+					String flowName = "";
+						
+					if(id.equals("Input")) {
+						flowName = state;
+					}else {
+						String[] stateParts = state.split("\\.");
+						flowName = stateParts[stateParts.length-1];
+					}
+					if(!entity.equals("")) {
+						boolean flowFlag = inspectFlow(flowName);
+						if(flowFlag) {
+							System.out.println("method name=" + methodName);
+							flows.put(new SimpleEntry(methodName, entity), flowName);
+						}						
+					}						
+				}									
+			}else {
+				String alias = inputAlias(state, inputs);
+				if(!alias.equals("")) {
+					inputs.add(alias);
+				}
+			}
+		}					
 		finalFlows.putAll(inspectFlows(flows));
-		
+		allAlias.put(methodName, methodAlias);		
 		return finalFlows;
 	}
 	
-	public void printInfo(HashMap<Entry<SimpleName,String>,Statement> methods) {
-		System.out.println("MethodCalls");
-		for(Entry<Entry<SimpleName,String>,Statement> entry : methods.entrySet()) {
-			System.out.println("Method Name: " + entry.getKey().getKey() + " Statement: " + entry.getValue() + " with type: " + entry.getKey().getValue());
-		}
-	}
-	
-	public String inputAlias(Statement statement, List<String> inputs) {
-		String state = statement.toString();
+	public String inputAlias(String statement, List<String> inputs) {
 		String alias = "";
+		String in = "";
 		boolean flag = false;
 		for(String st : inputs) {
-			if(state.contains(st)) {
+			if(statement.contains(st)) {
+				in = st;
 				flag = true;
 				break;
 			}
 		}
 		
-		if(state.contains("=")) {
+		if(statement.contains("=")) {
 			if(flag) {
-				String[] stateParts = state.split("=");
+				String[] stateParts = statement.split("=");
 				alias = stateParts[0];
 			}
-		}else if(state.contains(".") && !state.contains("=")) {
+		}else if(statement.contains(".") && !statement.contains("=")) {
 			if(flag) {
-				String[] stateParts = state.split("\\.");
+				String[] stateParts = statement.split("\\.");
 				alias = stateParts[0];
 			}
 		}
@@ -183,31 +221,15 @@ public class DataFlowExtractor {
 		}else {
 			alias = aliasParts[0];
 		}
+		methodAlias.put(alias, in);		
 		return alias;
 	}
 	
-	public HashMap<SimpleName,HashMap<Statement,String>> orderMethodCalls(List<SimpleName> methodNames, HashMap<Entry<SimpleName,String>,Statement> methods){
-		HashMap<SimpleName,HashMap<Statement,String>> ordered = new HashMap<>();
-		HashMap<Statement,String> methodStatements;
-				
-		for(SimpleName methodName : methodNames) {
-			methodStatements = new HashMap<>();
-			for(Entry<Entry<SimpleName,String>,Statement> methodCallEntry : methods.entrySet()) {
-				SimpleName name = methodCallEntry.getKey().getKey();
-				if(name.equals(methodName)) {
-					methodStatements.put(methodCallEntry.getValue(), methodCallEntry.getKey().getValue());
-				}
-			}
-			ordered.put(methodName, methodStatements);
-		}		
-		return ordered;
-	}
-	
-	public String checkStatement(Statement statement, HashMap<Statement,String> methodCalls) {
+	public String checkStatement(String statement, HashMap<Statement,String> methodCalls) {
 		String isMethodCall = "";
-		
 		for(Entry<Statement,String> entry : methodCalls.entrySet()) {
-			if(statement.equals((entry.getKey()))){
+			String state = entry.getKey().toString();
+			if(statement.equals((state))){
 				isMethodCall = entry.getValue();
 				break;
 			}
@@ -220,26 +242,20 @@ public class DataFlowExtractor {
 		
 		if(type.contains("BufferedReader") || type.contains("Scanner") || type.contains("ServletRequest") || type.contains("InputStreamReader")) {
 			id = "Input";
-		//} else if (type.contains("FileWriter") || type.contains("FileOutputStream") || type.contains("sql")) {
-			//id = "Data Store";
 		} else {
 			id = "Output";
 		}		
 		return id;
 	}
 
-	public String belongsTo(String type, List<ImportDeclaration> libraries, List<SimpleName> methodNames) {
+	public String belongsTo(String type, List<ImportDeclaration> libraries) {
 		String[] typeParts = type.split("\\(");
 		String[] typeEntities = typeParts[0].split("\\.");
-		String typeCheck = typeEntities[typeEntities.length-2]; 
-		String entity = belongsToMethod(typeEntities[typeEntities.length-1], methodNames);	
+		String typeCheck = typeEntities[typeEntities.length-1]; 
+		String entity = "";
 		
-		if(!entity.equals("")) {
-			return entity;
-		}
-		
-		for(ImportDeclaration id : libraries) {		
-			String lib = id.getNameAsString();
+		for(ImportDeclaration library : libraries) {	
+			String lib = library.getNameAsString();
 			String lib2 = "";
 			if(lib.equals("javax.servlet.http.HttpServletRequest")) {
 				lib2 = "javax.servlet.ServletRequest";
@@ -258,51 +274,77 @@ public class DataFlowExtractor {
 		}
 		
 		if(entity.equals("")) {
-			entity = typeCheck;
+			//entity = typeCheck;
+			entity = description + "_" +typeCheck;
 		}
 		return entity;
 	}
 	
-	public boolean checkState(Statement statement, List<String> inputs, HashMap<String,String> fields) {
+	public boolean checkState(String statement, List<String> inputs) {
 		boolean flag = false;
-		String state = statement.toString();
-		//System.out.println("Statement: " + statement);
 		
 		for(String st : inputs) {
-			if(state.contains(st)) {
+			if(statement.contains(st)) {
 				flag = true;
 				break;
 			}
 		}
 		
 		if(flag==false) {
-			if(state.contains("except")) {
+			if(statement.contains("except")) {
 				flag=true;
-			}
-		}
-		
-		if(flag==false && !fields.isEmpty()) {
-			for(Entry<String,String> entry : fields.entrySet()) {
-				//System.out.println("Statement: " + state);
-				if(state.contains(entry.getKey())) {
-					flag = true;
-					break;
-				}
 			}
 		}
 		return flag;
 	}
 	
-	public String belongsToMethod(String type, List<SimpleName> methodNames) {
+	public void traceMethod(String statement, String type, String methodName, List<String> inputs) {
+		//find a way to aliasing the current data used with the parameters of the other method
 		String entity = "";
-		for(SimpleName method : methodNames) {
-			String name = method.asString();
-			if(type.contains(name)) {
-				entity = type;
+		for(String method : methodNames) {
+			if(type.contains(method)) {
+				entity = method;
+				String al = "";
+				String[] stateParts = statement.split("\\(");
+				String name = stateParts[1];
+				name = name.replace(")", "");
+				name = name.replace(";", "");
+				int index = 0;
+				if(name.contains(",")) {
+					String[] nameParts = name.split("\\,");
+					for(String s : nameParts) {
+						boolean f = checkState(s,inputs);
+						if(f==false) {
+							index++;
+						}else {
+							break;
+						}
+					}
+					//locate which parameter is used and to which index and keep that
+				}
+				List<Parameter> parameters = getSpecificParam(method);
+				if(index==0) {
+					al = "empty";
+				}else {
+					al = parameters.get(index).getNameAsString();
+				}
+				methodCallTrace.put(new SimpleEntry(methodName, entity), new SimpleEntry(name, al));				
 			}
 		}		
-		return entity;
 	}
+	
+	public List<Parameter> getSpecificParam(String methodName){
+		List<Parameter> specificParam = new ArrayList<>();
+		for(DFD dfd : allDFDInfo) {
+			String cName = dfd.getMethodName();
+			if(methodName.equals(cName)) {
+				specificParam = dfd.getParameters();
+				break;
+			}
+		}
+		return specificParam;
+	}
+
 	
 	public HashMap< Entry<String,String>, String> inspectFlows(HashMap< Entry<String,String>, String> flows){
 		HashMap< Entry<String,String>, String> flow = new HashMap<>();
