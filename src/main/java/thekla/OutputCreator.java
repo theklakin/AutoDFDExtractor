@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import com.github.javaparser.ast.ImportDeclaration;
@@ -21,13 +22,21 @@ public class OutputCreator {
 	
 	public String createOutputFile(String input) {
 		String[] temp = input.split("\\\\");
-		String output = temp[temp.length-1];
+		String className = temp[temp.length-1];
+		String packName = temp[temp.length-2];
+				
+		if(className.contains("java")) {
+			className = className.replace(".java", ""); 
+		}
+		
+		String output = packName + "_" + className;
+		
 		return output;
 	}
 
 	public void writeOutput(Optional<PackageDeclaration> pack, List<ImportDeclaration> libraries, HashMap<String, String> fields, HashMap< Entry<String,String>, String> flows, String fileName, String s) {		
 		try {
-			fileName = "sub" + fileName;
+			//fileName = "sub" + fileName;
 			PrintWriter bw = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
 	        //bw.println("The following information is about " + pack.get().getNameAsString());
 			bw.println("The following information is about " + s);
@@ -72,16 +81,16 @@ public class OutputCreator {
 		}       		
 	}
 	
-	public void writeEntireDFD(List<String> externalEntities, List<String> flows, List<String> dataStores, String fileName) {
+	public void writeEntireDFD(Set<String> externalEntities, Set<String> flows, List<String> dataStores, String fileName) {
 		try {	
 			PrintWriter bw = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));	
-			bw.println("The External Entities are: ");
+			bw.println("The external entities are: ");
 			bw.println();
 			for(String externalEntity : externalEntities) {
 				bw.println(externalEntity);
 			}			
 			bw.println();
-			bw.println("The Data Stores are: ");
+			bw.println("The fields are: ");
 			bw.println();
 			if(dataStores.isEmpty()) {
 				bw.println("There are no Data Stores");

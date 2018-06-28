@@ -100,16 +100,16 @@ public class SpecificDFD {
 			PrintWriter bw = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
 			bw.println("This file contains the DFD for the variable " + variable);
 			bw.println();
-			bw.println("The External Entities are: ");
+			bw.println("The external entities are: ");
 			bw.println();
 			for(String externalEntity : externalEntities) {
 				bw.println(externalEntity);
 			}			
 			bw.println();
-			bw.println("The Data Stores are: ");
+			bw.println("The fields are: ");
 			bw.println();
 			if(dataStores.isEmpty()) {
-				bw.println("There are no Data Stores");
+				bw.println("There are no fields");
 			}else {
 				for(String dataStore : dataStores) {
 					bw.println(dataStore);

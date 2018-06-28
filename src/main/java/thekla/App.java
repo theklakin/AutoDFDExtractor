@@ -37,48 +37,47 @@ public class App
         OutputCreator output = new OutputCreator();
 		FileTraversal fileTraverse = new FileTraversal();
         
-		String fileName = output.createOutputFile(name);
+		String DFDfileName = output.createOutputFile(name);
 		
 		List<String> files = new ArrayList<>();
 		files = fileTraverse.getFiles(name);
 		
 		// creates an input stream for the file to be parsed
         FileInputStream in;
-		//InputStream in = null;
-        //List<ImportDeclaration> libraries = null;
-        //List<Optional<PackageDeclaration>> packages = new ArrayList<>();
-       // HashMap<SimpleName,List<Parameter>> allMethodNames = new HashMap<>();
-        InfoExtractor info = new InfoExtractor();
+        
         HashMap<Entry<String,String>, Entry<String, String>> methodCallTrace = new HashMap<>();
         HashMap<String,HashMap<String,String>> alias = new HashMap<>();
+        List<Optional<PackageDeclaration>> packages = new ArrayList<>();
+        List<String> subFiles = new ArrayList<>();
         
 		try {
 			for(String s : files) {
+				String fileName = output.createOutputFile(s);
+				subFiles.add(fileName);
+				InfoExtractor info = new InfoExtractor();
 				CombinedTypeSolver typeSolver = new CombinedTypeSolver();
 				typeSolver.add(new ReflectionTypeSolver());	
-				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
-				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\OnlineProjectEvaluator-CODE\\src\\")));
-				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
-				//typeSolver.add(new JavaParserTypeSolver(new File(name)));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
+				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\qatch\\src\\com\\issel\\")));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\alias\\Alias\\src\\")));
 				
 				in = new FileInputStream(s);
 		        // parse the file
 		        CompilationUnit cu = JavaParser.parse(in);
 		        
-		        String[] fileParts = s.split("\\\\");
-		        String[] fname = fileParts[fileParts.length-1].split("\\.");
-		        //String fileN = fname[0];
+		        //String[] fileParts = s.split("\\\\");
+		        //String[] fname = fileParts[fileParts.length-1].split("\\.");
 		        
 		        info.information(cu, typeSolver);
-		        //String f = "Info" + fileN;
-		        List<DFD> allDFDInfo = info.getDFDs();		    
+		        List<DFD> allDFDInfo = new ArrayList<>();
+		        allDFDInfo = info.getDFDs();	
+		        packages.add(info.getPackage());
 				
 		        //now i need to get flows
 				DataFlowExtractor dataFlow = new DataFlowExtractor(allDFDInfo,s);
 				HashMap< Entry<String,String>, String> flows = new HashMap<>();
 				flows = dataFlow.parseDFDInfo();
-				//flows = dataFlow.parseInfoFile(f);
-				//flows = dataFlow.methodFlows2(methodStmnt, libraries, methods, fields2, methodNames);
 				HashMap<String,String> dataStores = dataFlow.getDataStores();
 				Optional<PackageDeclaration> pack = info.getPackage();
 				methodCallTrace = dataFlow.getTrace();
@@ -104,19 +103,27 @@ public class App
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		String subfile = "sub" + fileName;
+		
+		//creation of the entire DFD
+		//first keep track of all the packages in order to know which external entities are actually not = packages
+		//then call the proper class
+		List<String> pack = new ArrayList<>();
+		for(Optional<PackageDeclaration> p : packages) {
+			pack.add(p.get().getNameAsString());
+		}
+		
+		EntireDFDExtractor finalDFD = new EntireDFDExtractor(pack);
+		finalDFD.extractDFD(subFiles, DFDfileName);
+				
 		DotFileCreator dotFileCreator = new DotFileCreator();
 		//EntireDFDExtractor dfd = new EntireDFDExtractor();
 		//dfd.extractDFD(allMethodNames, packages,fileName);
-		dotFileCreator.createVisualFile(subfile);
+		dotFileCreator.createVisualFile(DFDfileName);
 		System.out.println("I have finished");
-		//String variable = "";
-		fileName = "sub" + fileName;
 		System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
-		//scanner = new Scanner (System.in);
 		String variable = scanner.next();
 		while(!variable.equals("No")) {		
-				SpecificDFD specDFD = new SpecificDFD(fileName, variable, methodCallTrace, alias);
+				SpecificDFD specDFD = new SpecificDFD(DFDfileName, variable, methodCallTrace, alias);
 				specDFD.creteSpecificDFD();
 				System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
 				variable = scanner.next();

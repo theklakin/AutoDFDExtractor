@@ -21,5 +21,13 @@
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/json-simple-1.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/gson-2.2.4-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/jdom-1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6-contrib.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6-junit.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/qatchLibs/java-json.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/qatchLibs/jdom-1.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

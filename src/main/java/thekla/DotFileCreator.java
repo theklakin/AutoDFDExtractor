@@ -69,6 +69,9 @@ public class DotFileCreator {
 								if(name.contains(";")) {
 									name = name.replace(";", "");
 								}
+								if(name.contains("\"")){
+									name = name.replace("\"", "");
+								}
 							}
 						}
 						//System.out.println("from: " + from + " to " + to);
@@ -176,7 +179,7 @@ public class DotFileCreator {
 		} else {
 			for(String lib : libraries) {
 				//String libName = lib.getNameAsString();
-				if(lib.contains(name)) {
+				if(lib.contains(name) || name.contains("PrintStream")) {
 					shape = "box";
 					break;
 				}

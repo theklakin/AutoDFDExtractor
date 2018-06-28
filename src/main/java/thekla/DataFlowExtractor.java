@@ -21,7 +21,6 @@ public class DataFlowExtractor {
 	private HashMap<Entry<String,String>, Entry<String,String>> methodCallTrace;
 	private HashMap<String,HashMap<String,String>> allAlias;
 	private HashMap<String,String> methodAlias;
-	private String description;
 	
 	DataFlowExtractor(List<DFD> allDFDInfo, String s){
 		this.allDFDInfo = allDFDInfo;
@@ -30,9 +29,6 @@ public class DataFlowExtractor {
 		methodNames = new ArrayList<>();
 		methodCallTrace = new HashMap<>();
 		allAlias = new HashMap<>();
-		String[] temp = s.split("\\\\");
-		String[] temp2 = temp[temp.length-1].split("\\.");
-		description = temp2[0];
 		
 		for(DFD dfd : allDFDInfo) {
 			methodNames.add(dfd.getMethodName());
@@ -71,6 +67,10 @@ public class DataFlowExtractor {
 			methodStatements = dfd.getMethodStmnt();
 			methodCalls = dfd.getMethodCalls();			
 			String methodName = dfd.getMethodName();
+			
+			//for(Entry<Statement,String> entry : methodCalls.entrySet()) {
+			//	System.out.println("Statement: " + entry.getKey() + " has type: " + entry.getValue());
+			//}
 						
 			flows.putAll(methodFlows(methodName, inputs, methodStatements, methodCalls));
 		}	
@@ -174,7 +174,7 @@ public class DataFlowExtractor {
 					if(!entity.equals("")) {
 						boolean flowFlag = inspectFlow(flowName);
 						if(flowFlag) {
-							System.out.println("method name=" + methodName);
+							//System.out.println("method name=" + methodName);
 							flows.put(new SimpleEntry(methodName, entity), flowName);
 						}						
 					}						
@@ -252,6 +252,8 @@ public class DataFlowExtractor {
 		String[] typeParts = type.split("\\(");
 		String[] typeEntities = typeParts[0].split("\\.");
 		String typeCheck = typeEntities[typeEntities.length-1]; 
+		String description = typeEntities[typeEntities.length-2];
+
 		String entity = "";
 		
 		for(ImportDeclaration library : libraries) {	
@@ -261,6 +263,8 @@ public class DataFlowExtractor {
 				lib2 = "javax.servlet.ServletRequest";
 			} else if(lib.equals("javax.servlet.http.HttpServletResponse")) {
 				lib2 = "javax.servlet.ServletResponse";
+			} else if(description.contains("printStream")) {
+				lib2 = description;
 			}
 			if(type.contains(lib)) {
 				entity = lib;
@@ -370,6 +374,15 @@ public class DataFlowExtractor {
 		boolean flag = false;
 		if(!flowName.contains("close")) {
 			flag=true;
+		}
+		if(flowName.contains("(")) {
+			System.out.println("flow name: " + flowName);
+			String[] sub1 = flowName.split("\\(");
+			String[] sub2 = sub1[1].split("\\)");
+
+			if(sub2[0].equals("")) {
+				flag=false;
+			}
 		}
 		return flag;
 	}

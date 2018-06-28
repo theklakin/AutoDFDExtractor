@@ -82,7 +82,7 @@ public class InfoExtractor {
         libraries = cu.getImports(); 
         		        
         //returns the package
-        Optional<PackageDeclaration> pack = cu.getPackageDeclaration();
+        pack = cu.getPackageDeclaration();
         //packages.add(pack);
         
         HashMap<SimpleName, List<Statement>> methodStmnt = new HashMap<>();
