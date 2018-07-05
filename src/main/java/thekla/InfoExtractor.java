@@ -33,8 +33,10 @@ public class InfoExtractor {
 	
 	private Optional<PackageDeclaration> pack;
 	private List<DFD> allDFDInfo;
+	private String className;
 		
-	InfoExtractor(){
+	InfoExtractor(String className){
+		this.className = className;
 		System.out.println("Object InfoExtractor is created");
 		allDFDInfo = new ArrayList<>();
 	}
@@ -122,7 +124,7 @@ public class InfoExtractor {
 		//printAllInfoDFD();
 	}
 	
-	public void printAllInfoDFD() {
+	private void printAllInfoDFD() {
 		for(DFD dfd : allDFDInfo) {
 			System.out.println("This is the information regarding the " + dfd.getMethodName());
 			System.out.println("It has statements " + dfd.getMethodStmnt());
@@ -160,6 +162,7 @@ public class InfoExtractor {
 			}
 			dfd.setInputs(inputs);
 			dfd.setPack(pack);
+			dfd.setClassName(className);
 			allDFDInfo.add(dfd);
 		}
 	}
@@ -226,7 +229,7 @@ public class InfoExtractor {
 		}       	
 	}
 	
-	public HashMap<SimpleName,HashMap<Statement,String>> orderMethodCalls(HashMap<SimpleName,List<Parameter>> methodNames, HashMap<Entry<SimpleName,String>,Statement> methods){
+	private HashMap<SimpleName,HashMap<Statement,String>> orderMethodCalls(HashMap<SimpleName,List<Parameter>> methodNames, HashMap<Entry<SimpleName,String>,Statement> methods){
 		HashMap<SimpleName,HashMap<Statement,String>> ordered = new HashMap<>();
 		HashMap<Statement,String> methodStatements;
 				

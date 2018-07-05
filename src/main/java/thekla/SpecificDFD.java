@@ -125,8 +125,9 @@ public class SpecificDFD {
 			bw.println();
 			bw.close();
 			
-			DotFileCreator subDFDVis = new DotFileCreator();
-			subDFDVis.createVisualFile(fileName);
+			HashMap<Integer,Entry<String,String>> subDFD = new HashMap<>();
+			DotFileCreator subDFDVis = new DotFileCreator(fileName, subDFD);
+			subDFDVis.createVisualFile();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}  		

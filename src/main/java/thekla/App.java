@@ -49,18 +49,23 @@ public class App
         HashMap<String,HashMap<String,String>> alias = new HashMap<>();
         List<Optional<PackageDeclaration>> packages = new ArrayList<>();
         List<String> subFiles = new ArrayList<>();
+        HashMap<Integer, Entry<String,String>> subDFD = new HashMap<>();
+        int i = 0;
         
 		try {
 			for(String s : files) {
 				String fileName = output.createOutputFile(s);
+				String[] temp = fileName.split("_");
+				String className = temp[1];
 				subFiles.add(fileName);
-				InfoExtractor info = new InfoExtractor();
+				InfoExtractor info = new InfoExtractor(className);
 				CombinedTypeSolver typeSolver = new CombinedTypeSolver();
 				typeSolver.add(new ReflectionTypeSolver());	
-				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
-				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\qatch\\src\\com\\issel\\")));
-				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
+				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\qatch\\src\\com\\issel\\")));
+				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\alias\\Alias\\src\\")));
+				typeSolver.add(new JavaParserTypeSolver(new File(name)));
 				
 				in = new FileInputStream(s);
 		        // parse the file
@@ -77,7 +82,14 @@ public class App
 		        //now i need to get flows
 				DataFlowExtractor dataFlow = new DataFlowExtractor(allDFDInfo,s);
 				HashMap< Entry<String,String>, String> flows = new HashMap<>();
-				flows = dataFlow.parseDFDInfo();
+				dataFlow.parseDFDInfo();
+				flows = dataFlow.getFlows();
+				HashMap<String,String> temp2 = dataFlow.getSubDFDs();
+				
+				for(Entry<String,String> entry : temp2.entrySet()) {
+					subDFD.put(i, entry);
+					i++;
+				}			
 				HashMap<String,String> dataStores = dataFlow.getDataStores();
 				Optional<PackageDeclaration> pack = info.getPackage();
 				methodCallTrace = dataFlow.getTrace();
@@ -115,10 +127,10 @@ public class App
 		EntireDFDExtractor finalDFD = new EntireDFDExtractor(pack);
 		finalDFD.extractDFD(subFiles, DFDfileName);
 				
-		DotFileCreator dotFileCreator = new DotFileCreator();
+		DotFileCreator dotFileCreator = new DotFileCreator(DFDfileName, subDFD);
 		//EntireDFDExtractor dfd = new EntireDFDExtractor();
 		//dfd.extractDFD(allMethodNames, packages,fileName);
-		dotFileCreator.createVisualFile(DFDfileName);
+		dotFileCreator.createVisualFile();
 		System.out.println("I have finished");
 		System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
 		String variable = scanner.next();

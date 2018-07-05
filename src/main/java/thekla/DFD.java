@@ -18,6 +18,7 @@ public class DFD {
 	private HashMap<String, String> fields;
 	private List<ImportDeclaration> libraries;
 	private Optional<PackageDeclaration> pack;
+	private String className;
 	private List<Statement> methodStmnt;
 	private HashMap<Statement,String> methodCalls;
 	
@@ -92,5 +93,13 @@ public class DFD {
 
 	public void setMethodCalls(HashMap<Statement,String> methodCalls) {
 		this.methodCalls = methodCalls;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
 	}	
 }

@@ -17,21 +17,28 @@ import java.util.ArrayList;
 public class DotFileCreator {
 	
 	private int index;
+	private String file;
+	private List<String> externalEntities;
+	private HashMap<Integer,Entry<String,String>> visual;
+	private HashMap<String,String> shapes;
+	private HashMap<Integer,Entry<String,String>> subDFD;
 	
-	DotFileCreator(){
+	DotFileCreator(String file, HashMap<Integer,Entry<String,String>> subDFD){
+		this.file = file;
+		this.subDFD = subDFD;
+		externalEntities = new ArrayList<>();
+		shapes = new HashMap<>();
+		visual = new HashMap<>();
 		index = 0;
 		System.out.println("DotFileCreator Object is created");
 	}
 	
-	public void createVisualFile(String file) {
-		//System.out.println(file);
-		HashMap<Integer,Entry<String,String>> visual = new HashMap<>();
-		List<String> externalEntities = new ArrayList<>();
+	public void createVisualFile() {
+		//System.out.println(file);	
 		BufferedReader br = null;
 		FileReader fr = null;
 		String sCurrentLine;
 		//boolean flag = false;
-		HashMap<String,String> shapes = new HashMap<>();
 		boolean externalEntityFlag = false;
 		
 		try {
@@ -99,7 +106,14 @@ public class DotFileCreator {
 			e.printStackTrace();
 		}
 		
-		
+		detailedView();
+		if(!subDFD.isEmpty()) {
+			intermediateView(); 
+			abstractView();
+		}
+	}
+	
+	public void detailedView() {
 		String fileName = file + ".gv";
 		try {
 			PrintWriter v = new PrintWriter(new BufferedWriter(new FileWriter(fileName)));
@@ -123,6 +137,143 @@ public class DotFileCreator {
 		}
 	}
 	
+	public void intermediateView() {
+		String fileName = "Intermediate_View_" + file + ".gv";
+		String DFDfile = "Intermediate_View_" + file;
+		HashMap<String,String> subShapes = new HashMap<>();
+		try {
+			PrintWriter v = new PrintWriter(new BufferedWriter(new FileWriter(fileName)));
+			v.println("digraph G{");
+			for(Entry<Integer,Entry<String,String>> entry : visual.entrySet()) {
+				Entry<String,String> flow = entry.getValue();
+				String from = intermediateName(flow.getKey());
+				String shape = "";
+				if(from.isEmpty()) {
+					from = flow.getKey();	
+					shape = getSubShape(from);
+				}else {
+					shape = "circle";
+				}
+				
+				String[] fromParts = from.split(" ");
+				subShapes.put(fromParts[0], shape);
+				
+				String to = intermediateName(flow.getValue());
+				if(to.isEmpty()) {
+					to = flow.getValue();
+					shape = getSubShape(to);
+				}else {
+					shape= "circle";
+				}
+				String[] toParts = to.split(" ");
+				subShapes.put(toParts[0], shape);
+				
+				v.println("    " + from + " " + to);
+			}
+			
+			v.println();
+			v.println();
+			
+			for(Entry<String,String> entry : subShapes.entrySet()) {
+				v.println("    " + entry.getKey() + " [shape=" + entry.getValue() + "];");
+			}
+			
+			v.println("}");
+			v.close();
+			createImage(fileName, DFDfile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void abstractView() {
+		String fileName = "Abstract_View_" + file + ".gv";
+		String DFDfile = "Abstract_View_" + file;
+		HashMap<String,String> subShapes = new HashMap<>();
+		try {
+			PrintWriter v = new PrintWriter(new BufferedWriter(new FileWriter(fileName)));
+			v.println("digraph G{");
+			for(Entry<Integer,Entry<String,String>> entry : visual.entrySet()) {
+				Entry<String,String> flow = entry.getValue();
+				String from = abstractName(flow.getKey());
+				String shape = "";
+				if(from.isEmpty()) {
+					from = flow.getKey();	
+					shape = getSubShape(from);
+				}else {
+					shape = "circle";
+				}
+				
+				String[] fromParts = from.split(" ");
+				subShapes.put(fromParts[0], shape);
+				
+				String to = abstractName(flow.getValue());
+				if(to.isEmpty()) {
+					to = flow.getValue();
+					shape = getSubShape(to);
+				}else {
+					shape= "circle";
+				}
+				String[] toParts = to.split(" ");
+				subShapes.put(toParts[0], shape);
+				
+				v.println("    " + from + " " + to);
+			}
+			
+			v.println();
+			v.println();
+			
+			for(Entry<String,String> entry : subShapes.entrySet()) {
+				v.println("    " + entry.getKey() + " [shape=" + entry.getValue() + "];");
+			}
+			
+			v.println("}");
+			v.close();
+			createImage(fileName, DFDfile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private String getSubShape(String name) {
+		String shape = "";
+		for(Entry<String,String> entry : shapes.entrySet()) {
+			String n = entry.getKey();
+			if(name.contains(n)) {
+				shape = entry.getValue();
+			}
+		}
+		return shape;
+	}
+	
+	private String abstractName(String name) {
+		String finalName = "";
+		for(Entry<Integer,Entry<String,String>> entry : subDFD.entrySet()) {
+			Entry<String,String> sub = entry.getValue();
+			if(name.contains(sub.getKey())) {
+				String[] nameParts = name.split(" ");
+				
+				finalName = sub.getValue() + " " + nameParts[1];
+			}
+		}		
+		return finalName;
+	}
+	
+	
+	private String intermediateName(String name) {
+		String finalName = "";
+		for(Entry<Integer,Entry<String,String>> entry : subDFD.entrySet()) {
+			Entry<String,String> sub = entry.getValue();
+			if(name.contains(sub.getKey())) {
+				String[] nameParts = name.split(" ");
+				
+				finalName = sub.getKey() + " " + nameParts[1];
+			}
+		}		
+		return finalName;
+	}
+	
 	public void createImage(String file, String name) {
 		//the command that is going to be given to cmd
 		String dfdName = name + ".jpeg";
@@ -140,7 +291,7 @@ public class DotFileCreator {
 		}	
 	}
 	
-	public String chackName(String name) {
+	private String chackName(String name) {
 		String newName=name;
 		
 		if(name.contains(")") && !name.contains("(")) {
@@ -150,7 +301,7 @@ public class DotFileCreator {
 		return newName;
 	}
 	
-	public String check(String name) {
+	private String check(String name) {
 		String newName = name;
 		
 		/*
@@ -170,7 +321,7 @@ public class DotFileCreator {
 		return newName;
 	}
 	
-	public String getShape(String name, List<String> libraries) {
+	private String getShape(String name, List<String> libraries) {
 		String shape = "circle";
 		
 		if(name.contains("database") || name.contains("file")) {

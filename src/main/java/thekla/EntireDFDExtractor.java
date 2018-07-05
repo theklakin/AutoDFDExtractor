@@ -98,7 +98,7 @@ public class EntireDFDExtractor {
 		finalFile.writeEntireDFD(hsEE, hsF, dataStores, DFDFileName);
 	}
 	
-	public String checkFlows(String flow) {
+	private String checkFlows(String flow) {
 		String updatedFlow = "";
 		
 		for(String pack : packages) {
@@ -123,7 +123,7 @@ public class EntireDFDExtractor {
 		return updatedFlow;
 	}
 	
-	public String getComponent(String[] flowParts, int i, String prefix) {
+	private String getComponent(String[] flowParts, int i, String prefix) {
 		String component = "";
 		//part1: name of the method
 		String methodName = flowParts[flowParts.length-1];
@@ -135,7 +135,7 @@ public class EntireDFDExtractor {
 		return component;
 	}
 	
-	public boolean checkExternalEntities(String externalEntity) {
+	private boolean checkExternalEntities(String externalEntity) {
 		boolean contain = false;
 		
 		/*for(SimpleName name : methodName) {
