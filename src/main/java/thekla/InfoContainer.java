@@ -2,6 +2,7 @@ package thekla;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +11,7 @@ import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.stmt.Statement;
 
-public class DFD {
+public class InfoContainer {
 	
 	private String methodName;
 	private List<String> inputs;
@@ -20,9 +21,9 @@ public class DFD {
 	private Optional<PackageDeclaration> pack;
 	private String className;
 	private List<Statement> methodStmnt;
-	private HashMap<Statement,String> methodCalls;
+	private HashMap<Integer, Entry<Statement,String>> methodCalls;
 	
-	DFD(){
+	InfoContainer(){
 		setInputs(new ArrayList<>());
 		setParameters(new ArrayList<>());
 		setFields(new HashMap<>());
@@ -87,11 +88,11 @@ public class DFD {
 		this.methodStmnt = methodStmnt;
 	}
 
-	public HashMap<Statement,String> getMethodCalls() {
+	public HashMap<Integer, Entry<Statement,String>> getMethodCalls() {
 		return methodCalls;
 	}
 
-	public void setMethodCalls(HashMap<Statement,String> methodCalls) {
+	public void setMethodCalls(HashMap<Integer, Entry<Statement,String>> methodCalls) {
 		this.methodCalls = methodCalls;
 	}
 

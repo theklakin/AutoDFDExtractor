@@ -34,7 +34,7 @@ public class OutputCreator {
 		return output;
 	}
 
-	public void writeOutput(Optional<PackageDeclaration> pack, List<ImportDeclaration> libraries, HashMap<String, String> fields, HashMap< Entry<String,String>, String> flows, String fileName, String s) {		
+	public void writeOutput(Optional<PackageDeclaration> pack, List<ImportDeclaration> libraries, HashMap<String, String> fields, HashMap<Integer, String> flowsFrom, HashMap<Integer, String> flowsTo, HashMap<Integer, String> flowsName, String fileName, String s) {		
 		try {
 			//fileName = "sub" + fileName;
 			PrintWriter bw = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
@@ -60,19 +60,24 @@ public class OutputCreator {
 			
 			bw.println("The flows are: ");
 			bw.println();
-			for (Entry<Entry<String,String>, String> entry : flows.entrySet()) {
-				String[] temp = s.split("\\\\");
-				String[] temp2 = temp[temp.length-1].split("\\.");
-				String specification = temp2[0];
-				Entry<String,String> inside = entry.getKey();
-				String direction = "";
-				String t = inside.getValue();
-				if(t.contains("from")) {
-					direction = "to";
-				}else {
-					direction = "from";
-				}
-				bw.println("There is a flow " + direction + " " + specification + "_" + inside.getKey() + " " + inside.getValue() + " with the name: " + entry.getValue());				
+			//for (Entry<Entry<String,String>, String> entry : flows.entrySet()) {
+			for(Entry<Integer, String> entry : flowsName.entrySet()) {
+				//String[] temp = s.split("\\\\");
+				//String[] temp2 = temp[temp.length-1].split("\\.");
+				//String specification = temp2[0];
+				int i = entry.getKey();
+				String from = flowsFrom.get(i);
+				String to = flowsTo.get(i);
+				//Entry<String,String> inside = entry.getKey();
+				//String direction = "";
+				//String t = inside.getValue();
+				//if(t.contains("from")) {
+				//	direction = "to";
+				//}else {
+				//	direction = "from";
+				//}
+				bw.println(from + " " + to + " with the name: " + entry.getValue());
+				//bw.println("There is a flow " + direction + " " + specification + "_" + inside.getKey() + " " + inside.getValue() + " with the name: " + entry.getValue());				
 			}
 			bw.println();
 			bw.close();

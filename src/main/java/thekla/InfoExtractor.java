@@ -32,10 +32,12 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 public class InfoExtractor {
 	
 	private Optional<PackageDeclaration> pack;
-	private List<DFD> allDFDInfo;
+	private List<InfoContainer> allDFDInfo;
 	private String className;
+	private Integer index;
 		
 	InfoExtractor(String className){
+		index = 0;
 		this.className = className;
 		System.out.println("Object InfoExtractor is created");
 		allDFDInfo = new ArrayList<>();
@@ -45,7 +47,7 @@ public class InfoExtractor {
 		return pack;
 	}
 	
-	public List<DFD> getDFDs(){
+	public List<InfoContainer> getDFDs(){
 		return allDFDInfo;
 	}
 	
@@ -109,32 +111,36 @@ public class InfoExtractor {
         	}
         }
         
-		HashMap<Entry<SimpleName,String>,Statement> methods = new HashMap<>();
-
+		HashMap<Entry<SimpleName,Integer>,Entry<String,Statement>> methods = new HashMap<>();
+		int index = 0;
 		for (Entry<SimpleName, List<Statement>> entry : methodStmnt.entrySet()) {
 			for(Statement st : entry.getValue()) {
 				List<MethodCallExpr> methodCalls = Navigator.findAllNodesOfGivenClass(st, MethodCallExpr.class);
-				methodCalls.forEach(mc-> methods.put(new SimpleEntry(entry.getKey(),JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature()),st));
+				for(MethodCallExpr mc : methodCalls) {
+					index++;
+					methods.put(new SimpleEntry(entry.getKey(),index), new SimpleEntry(JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature(),st));
+				}
+				//methodCalls.forEach(mc-> methods.put(new SimpleEntry(entry.getKey(),JavaParserFacade.get(typeSolver).solve(mc).getCorrespondingDeclaration().getQualifiedSignature()),st));
 			}
 		}
 		
 		HashMap<SimpleName,HashMap<Statement,String>> orderedMethodCalls = orderMethodCalls(methodNames, methods);
 		//createInfoFile(file, libraries, fields2, allMethodNames, methodStmnt, orderedMethodCalls);
-		information(libraries, fields2, allMethodNames, methodStmnt, orderedMethodCalls);
+		inform(libraries, fields2, allMethodNames, methodStmnt, orderedMethodCalls);
 		//printAllInfoDFD();
 	}
 	
 	private void printAllInfoDFD() {
-		for(DFD dfd : allDFDInfo) {
+		for(InfoContainer dfd : allDFDInfo) {
 			System.out.println("This is the information regarding the " + dfd.getMethodName());
 			System.out.println("It has statements " + dfd.getMethodStmnt());
 		}
 	}
 	
-	public void information(List<ImportDeclaration> libraries, HashMap<String, String> fields, HashMap<SimpleName,List<Parameter>> allMethodNames,  HashMap<SimpleName, List<Statement>> methodStmnt, HashMap<SimpleName,HashMap<Statement,String>> orderedMethodCalls){
+	private void inform(List<ImportDeclaration> libraries, HashMap<String, String> fields, HashMap<SimpleName,List<Parameter>> allMethodNames,  HashMap<SimpleName, List<Statement>> methodStmnt, HashMap<SimpleName,HashMap<Statement,String>> orderedMethodCalls){
 		for(Entry<SimpleName,List<Parameter>> entry : allMethodNames.entrySet()) {
 			SimpleName name = entry.getKey();
-			DFD dfd = new DFD();
+			InfoContainer dfd = new InfoContainer();
 			dfd.setMethodName(entry.getKey().asString());
 			dfd.setParameters(entry.getValue());
 			dfd.setLibraries(libraries);
@@ -149,7 +155,13 @@ public class InfoExtractor {
 			for(Entry<SimpleName, HashMap<Statement,String>> en : orderedMethodCalls.entrySet()) {
 				SimpleName n = en.getKey();
 				if(n.equals(name)) {
-					dfd.setMethodCalls(en.getValue());
+					HashMap<Integer, Entry<Statement,String>> methodCalls =  new HashMap<>();
+					HashMap<Statement,String> mCalls = en.getValue();
+					for(Entry<Statement,String> m : mCalls.entrySet()) {
+						index++;
+						methodCalls.put(index, new SimpleEntry(m.getKey(),m.getValue()));
+					}
+					dfd.setMethodCalls(methodCalls);
 				}
 			}
 			List<String> inputs = new ArrayList<>();
@@ -229,17 +241,17 @@ public class InfoExtractor {
 		}       	
 	}
 	
-	private HashMap<SimpleName,HashMap<Statement,String>> orderMethodCalls(HashMap<SimpleName,List<Parameter>> methodNames, HashMap<Entry<SimpleName,String>,Statement> methods){
+	private HashMap<SimpleName,HashMap<Statement,String>> orderMethodCalls(HashMap<SimpleName,List<Parameter>> methodNames, HashMap<Entry<SimpleName,Integer>,Entry<String,Statement>> methods){
 		HashMap<SimpleName,HashMap<Statement,String>> ordered = new HashMap<>();
 		HashMap<Statement,String> methodStatements;
 				
 		for(Entry<SimpleName,List<Parameter>> entry : methodNames.entrySet()) {
 			SimpleName methodName = entry.getKey();
 			methodStatements = new HashMap<>();
-			for(Entry<Entry<SimpleName,String>,Statement> methodCallEntry : methods.entrySet()) {
+			for(Entry<Entry<SimpleName,Integer>, Entry<String,Statement>> methodCallEntry : methods.entrySet()) {
 				SimpleName name = methodCallEntry.getKey().getKey();
 				if(name.equals(methodName)) {
-					methodStatements.put(methodCallEntry.getValue(), methodCallEntry.getKey().getValue());
+					methodStatements.put(methodCallEntry.getValue().getValue(), methodCallEntry.getValue().getKey());
 				}
 			}
 			ordered.put(methodName, methodStatements);

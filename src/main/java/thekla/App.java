@@ -3,6 +3,7 @@ package thekla;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.JarTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
@@ -24,10 +26,17 @@ public class App
 	
 	public static void main( String[] args )
     {		
-		//first we need to ask the user to insert the directory of the code		
-		System.out.println("Please insert the path to the src file under inspection.");
+		//get the dependencies
+		System.out.println("Please insert the path to the dependency file.");
 		//and read his/her input
 		Scanner scanner = new Scanner (System.in);
+		String path = scanner.next();	
+		Dependencies dependencies = new Dependencies(path);
+		dependencies.addDependencies();
+		List<String> dependencyJars = dependencies.getDependencies();
+		System.out.println("Please insert the path to the src file under inspection.");
+		//and read his/her input
+		//scanner = new Scanner (System.in);
 		String name = scanner.next();	
 		//System.out.println("Please insert the path to the src file dependency.");
 		//scanner = new Scanner (System.in);
@@ -60,30 +69,45 @@ public class App
 				subFiles.add(fileName);
 				InfoExtractor info = new InfoExtractor(className);
 				CombinedTypeSolver typeSolver = new CombinedTypeSolver();
-				typeSolver.add(new ReflectionTypeSolver());	
-				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
-				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\qatch\\src\\com\\issel\\")));
-				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
+				typeSolver.add(new ReflectionTypeSolver(false));	
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\alias\\Alias\\src\\")));
-				typeSolver.add(new JavaParserTypeSolver(new File(name)));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\qatch\\qatch\\src\\")));
+				try {
+					for(String jar: dependencyJars) {
+						typeSolver.add(new JarTypeSolver(jar));
+					}
+					
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				typeSolver.add(new JavaParserTypeSolver(new File(name+"\\")));
 				
 				in = new FileInputStream(s);
 		        // parse the file
 		        CompilationUnit cu = JavaParser.parse(in);
+		        cu.removeComment();
 		        
 		        //String[] fileParts = s.split("\\\\");
 		        //String[] fname = fileParts[fileParts.length-1].split("\\.");
 		        
 		        info.information(cu, typeSolver);
-		        List<DFD> allDFDInfo = new ArrayList<>();
+		        List<InfoContainer> allDFDInfo = new ArrayList<>();
 		        allDFDInfo = info.getDFDs();	
 		        packages.add(info.getPackage());
 				
 		        //now i need to get flows
-				DataFlowExtractor dataFlow = new DataFlowExtractor(allDFDInfo,s);
-				HashMap< Entry<String,String>, String> flows = new HashMap<>();
+				DataFlowExtractor dataFlow = new DataFlowExtractor(allDFDInfo,className);
+				//HashMap< Entry<String,String>, String> flows = new HashMap<>();
+				HashMap<Integer, String> flowsFrom = new HashMap<>();
+				HashMap<Integer, String> flowsTo = new HashMap<>();
+				HashMap<Integer, String> flowsName = new HashMap<>();
 				dataFlow.parseDFDInfo();
-				flows = dataFlow.getFlows();
+				flowsFrom = dataFlow.getFlowsFrom();
+				flowsTo = dataFlow.getFlowsTo();
+				flowsName = dataFlow.getFlowsName();
+				//flows = dataFlow.getFlows();
 				HashMap<String,String> temp2 = dataFlow.getSubDFDs();
 				
 				for(Entry<String,String> entry : temp2.entrySet()) {
@@ -104,13 +128,13 @@ public class App
 				alias = dataFlow.getAllAlias();
 				/*for(Entry<String, HashMap<String, String>> aliasEntry : alias.entrySet()) {
 					System.out.println("Method: " + aliasEntry.getKey() + " has the following info about alias.");
-					HashMap<String, String> temp = aliasEntry.getValue();
-					for(Entry<String,String> tempE : temp.entrySet()) {
+					HashMap<String, String> tem = aliasEntry.getValue();
+					for(Entry<String,String> tempE : tem.entrySet()) {
 						System.out.println("The " + tempE.getValue() + " has alias: " + tempE.getKey());
 					}
 				}*/
 				List<ImportDeclaration> libraries = dataFlow.getExternalEntities();
-				output.writeOutput(pack, libraries, dataStores, flows, fileName,s);
+				output.writeOutput(pack, libraries, dataStores, flowsFrom, flowsTo, flowsName, fileName,s);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

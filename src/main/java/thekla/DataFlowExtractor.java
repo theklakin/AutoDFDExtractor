@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class DataFlowExtractor {
 	
-	private List<DFD> allDFDInfo = new ArrayList<>();
+	private List<InfoContainer> allDFDInfo = new ArrayList<>();
 	private HashMap<String,String> dataStores;
 	private List<ImportDeclaration> externalEntities;
 	private List<String> methodNames;
@@ -22,24 +22,41 @@ public class DataFlowExtractor {
 	private HashMap<String,HashMap<String,String>> allAlias;
 	private HashMap<String,String> methodAlias;
 	private HashMap<String,String> subDFD= new HashMap<>();
-	private HashMap<Entry<String,String>, String> flows;
+	//private HashMap<Entry<String,String>, String> flows;
+	private HashMap<Integer, String> flowsFrom;
+	private HashMap<Integer, String> flowsTo;
+	private HashMap<Integer, String> flowsName;
+	private Integer index;
+	private String description;
 	
-	DataFlowExtractor(List<DFD> allDFDInfo, String s){
+	DataFlowExtractor(List<InfoContainer> allDFDInfo, String s){
+		description = s;
 		this.allDFDInfo = allDFDInfo;
 		dataStores = new HashMap<>();
 		externalEntities = allDFDInfo.get(0).getLibraries();
 		methodNames = new ArrayList<>();
 		methodCallTrace = new HashMap<>();
 		allAlias = new HashMap<>();
-		flows = new HashMap<>();
+		flowsFrom = new HashMap<>();
+		flowsTo = new HashMap<>();
+		flowsName = new HashMap<>();
+		index = 0;
 		
-		for(DFD dfd : allDFDInfo) {
+		for(InfoContainer dfd : allDFDInfo) {
 			methodNames.add(dfd.getMethodName());
 		}
 	}
 	
-	public HashMap<Entry<String,String>, String> getFlows(){
-		return flows;
+	public HashMap<Integer,String> getFlowsFrom() {
+		return flowsFrom;
+	}
+	
+	public HashMap<Integer,String> getFlowsTo() {
+		return flowsTo;
+	}
+	
+	public HashMap<Integer,String> getFlowsName() {
+		return flowsName;
 	}
 	
 	public HashMap<String,String> getDataStores() {
@@ -67,10 +84,10 @@ public class DataFlowExtractor {
 	}
 		
 	public void parseDFDInfo() {		
-		for(DFD dfd : allDFDInfo) {
+		for(InfoContainer dfd : allDFDInfo) {
 			List<String> inputs = new ArrayList<>();
 			List<Statement> methodStatements = new ArrayList<>();
-			HashMap<Statement,String> methodCalls = new HashMap<>();
+			HashMap<Integer, Entry<Statement,String>> methodCalls = new HashMap<>();
 			
 			inputs = dfd.getInputs();
 			methodStatements = dfd.getMethodStmnt();
@@ -79,7 +96,8 @@ public class DataFlowExtractor {
 			String pack = dfd.getPack().get().getNameAsString();
 			String className = dfd.getClassName();
 			subDFD.put(className, pack);
-			flows.putAll(methodFlows(methodName, inputs, methodStatements, methodCalls));
+			//flows.putAll(methodFlows(methodName, inputs, methodStatements, methodCalls));
+			methodFlows(methodName, inputs, methodStatements, methodCalls);
 		}	
 	}
 	
@@ -105,9 +123,9 @@ public class DataFlowExtractor {
 		}
 	}
 	
-	private HashMap<Entry<String,String>, String> methodFlows(String methodName, List<String> inputs, List<Statement> methodStatements, HashMap<Statement,String> methodCalls) {
-		HashMap<Entry<String,String>, String> flows = new HashMap<>();
-		HashMap<Entry<String,String>, String> finalFlows = new HashMap<>();
+	private void methodFlows(String methodName, List<String> inputs, List<Statement> methodStatements, HashMap<Integer, Entry<Statement,String>> methodCalls) {
+		//HashMap<Entry<String,String>, String> flows = new HashMap<>();
+		//HashMap<Entry<String,String>, String> finalFlows = new HashMap<>();
 		methodAlias = new HashMap<>();
 		//System.out.println("Method: " + methodName);
 		//printFounInfo(inputs, methodStatements, methodCalls);
@@ -116,7 +134,8 @@ public class DataFlowExtractor {
 			String state = statement.toString();
 			String type = checkStatement(state, methodCalls);
 			if(!type.equals("")) {
-				//System.out.println("Type=" +type);
+				//System.out.println("statement " + statement);
+				//System.out.println("type " + type);
 				traceMethod(state, type, methodName, inputs);
 				String component = "";
 				String entity="";
@@ -173,18 +192,39 @@ public class DataFlowExtractor {
 						entity = "from " + component;
 					} else entity = "to " + component;
 					String flowName = "";
+					//System.out.println("entity: " + entity);
 						
 					if(id.equals("Input")) {
 						flowName = state;
 					}else {
 						String[] stateParts = state.split("\\.");
-						flowName = stateParts[stateParts.length-1];
+						if(stateParts.length>2) {
+							for(int i=1; i<stateParts.length; i++) {
+								flowName = flowName+stateParts[i];
+							}
+						}else {
+							flowName = stateParts[stateParts.length-1];
+						}
 					}
+					//System.out.println("flow name: " + flowName);
 					if(!entity.equals("")) {
 						boolean flowFlag = inspectFlow(flowName);
 						if(flowFlag) {
 							//System.out.println("method name=" + methodName);
-							flows.put(new SimpleEntry(methodName, entity), flowName);
+							entity = inspectFlows(entity);
+							flowName = inspectFlowName(flowName);
+							if(!flowName.equals("")) {
+								index++;
+								flowsName.put(index, flowName);
+								if(entity.contains("from")) {
+									flowsFrom.put(index, entity);
+									flowsTo.put(index, "to " + description + "_" +methodName);
+								}else {
+									flowsTo.put(index, entity);
+									flowsFrom.put(index, "from " + description + "_" +methodName);
+								}
+							}
+							//flows.put(new SimpleEntry(methodName, entity), flowName);
 						}						
 					}						
 				}									
@@ -195,9 +235,9 @@ public class DataFlowExtractor {
 				}
 			}
 		}					
-		finalFlows.putAll(inspectFlows(flows));
+		//finalFlows.putAll(inspectFlows(flows));
 		allAlias.put(methodName, methodAlias);		
-		return finalFlows;
+		//return finalFlows;
 	}
 	
 	private String inputAlias(String statement, List<String> inputs) {
@@ -234,12 +274,13 @@ public class DataFlowExtractor {
 		return alias;
 	}
 	
-	private String checkStatement(String statement, HashMap<Statement,String> methodCalls) {
+	private String checkStatement(String statement, HashMap<Integer, Entry<Statement,String>> methodCalls) {
 		String isMethodCall = "";
-		for(Entry<Statement,String> entry : methodCalls.entrySet()) {
-			String state = entry.getKey().toString();
+		for(Entry<Integer, Entry<Statement,String>> entry : methodCalls.entrySet()) {
+			Entry<Statement,String> mCall = entry.getValue();
+			String state = mCall.getKey().toString();
 			if(statement.equals((state))){
-				isMethodCall = entry.getValue();
+				isMethodCall = mCall.getValue();
 				break;
 			}
 		}		
@@ -275,7 +316,7 @@ public class DataFlowExtractor {
 			} else if(description.contains("printStream")) {
 				lib2 = description;
 			}
-			if(type.contains(lib)) {
+			if(typeParts[0].contains(lib)) {
 				entity = lib;
 				break;
 			}else if(!lib2.equals("")) {
@@ -348,7 +389,7 @@ public class DataFlowExtractor {
 	
 	private List<Parameter> getSpecificParam(String methodName){
 		List<Parameter> specificParam = new ArrayList<>();
-		for(DFD dfd : allDFDInfo) {
+		for(InfoContainer dfd : allDFDInfo) {
 			String cName = dfd.getMethodName();
 			if(methodName.equals(cName)) {
 				specificParam = dfd.getParameters();
@@ -357,13 +398,24 @@ public class DataFlowExtractor {
 		}
 		return specificParam;
 	}
+	
+	private String inspectFlowName(String flowName) {
+		if(flowName.contains("except")) {
+			int index = flowName.indexOf("except");
+			flowName = flowName.substring(index);
+		}
+		if(flowName.contains("close")) {
+			flowName = "";
+		}
+		return flowName;
+	}
 
 	
-	private HashMap< Entry<String,String>, String> inspectFlows(HashMap< Entry<String,String>, String> flows){
-		HashMap< Entry<String,String>, String> flow = new HashMap<>();
-		for(Entry<Entry<String,String>, String> entry : flows.entrySet()) {
-			String entity = entry.getKey().getValue();
-			String flowName = entry.getValue();
+	private String inspectFlows(String entity){
+		//HashMap< Entry<String,String>, String> flow = new HashMap<>();
+		//for(Entry<Entry<String,String>, String> entry : flows.entrySet()) {
+			//String entity = entry.getKey().getValue();
+			//String flowName = entry.getValue();
 			if(entity.contains("sql")) {
 				String[] entityParts = entity.split(" ");
 				entity = entityParts[0] + " database";
@@ -372,15 +424,8 @@ public class DataFlowExtractor {
 				String[] entityParts = entity.split(" ");
 				entity = entityParts[0] + " file";
 			}
-			if(flowName.contains("except")) {
-				int index = flowName.indexOf("except");
-				flowName = flowName.substring(index);
-			}
-			if(!flowName.contains("close")) {
-				flow.put(new SimpleEntry(entry.getKey().getKey(), entity), flowName);
-			}
-		}		
-		return flow;
+		//}		
+		return entity;
 	}
 	
 	private boolean inspectFlow(String flowName) {

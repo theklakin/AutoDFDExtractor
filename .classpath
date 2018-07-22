@@ -15,19 +15,17 @@
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/sssss/java-symbol-solver-logic-0.6.3.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/sssss/java-symbol-solver-model-0.6.3.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/sssss/jsr305-1.3.9.jar"/>
-	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/javax.servlet.jar"/>
-	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/org.json.jar"/>
-	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/java-json.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/json-simple-1.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/gson-2.2.4-sources.jar"/>
-	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/jdom-1.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-1.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/qatchLibs/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/qatchLibs/jdom-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/qatchLibs/org.json.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6-contrib.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6-javadoc.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6-junit.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6-sources.jar"/>
-	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/qatchLibs/java-json.jar"/>
-	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/qatchLibs/jdom-1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/java-json.jar"/>
+	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/qatchLibs/json-20180130.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
