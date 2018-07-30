@@ -28,10 +28,14 @@ public class DataFlowExtractor {
 	private HashMap<Integer, String> flowsName;
 	private Integer index;
 	private String description;
+	private List<String> inputLibs;
+	private List<String> outputLibs;
 	
-	DataFlowExtractor(List<InfoContainer> allDFDInfo, String s){
+	DataFlowExtractor(List<InfoContainer> allDFDInfo, String s, List<String> inputLibs, List<String> outputLibs){
 		description = s;
 		this.allDFDInfo = allDFDInfo;
+		this.inputLibs = inputLibs;
+		this.outputLibs = outputLibs;
 		dataStores = new HashMap<>();
 		externalEntities = allDFDInfo.get(0).getLibraries();
 		methodNames = new ArrayList<>();
@@ -162,10 +166,20 @@ public class DataFlowExtractor {
 						inputs.add(localVar);
 					} 
 					component = belongsTo(type,externalEntities);
-					//System.out.println("Component= " + component);
 					break;
 				case "Output" :
 					boolean contain = checkState(state,inputs);
+					if(contain == false) {
+						for(String libs : outputLibs) {
+							if(type.contains(libs)) {
+								contain = true;
+							}
+						}
+					}
+					
+					//if(type.contains("sql") || type.contains("File")) {
+					//	contain = true;
+					//}
 					String alias = inputAlias(state, inputs);
 					if(!alias.equals("")) {
 						inputs.add(alias);
@@ -186,7 +200,7 @@ public class DataFlowExtractor {
 				if(state.contains("=") && !out) {
 					flag=true;
 				}
-										
+				//System.out.println("Component= " + component);						
 				if(!component.equals("")) {
 					if(flag) {
 						entity = "from " + component;
@@ -288,13 +302,26 @@ public class DataFlowExtractor {
 	}
 	
 	private String inspectType(String type){
-		String id = "";
+		String id = "";		
+		//i want to parse Inputs/Outputs to check if the type belongs to any of the libraries there
+		String[] actual = type.split("\\(");
+		String actualType = actual[0];
+
+		for(String libs : inputLibs) {
+			if(actualType.contains(libs)) {
+				id = "Input";
+			}
+		}
 		
-		if(type.contains("BufferedReader") || type.contains("Scanner") || type.contains("ServletRequest") || type.contains("InputStreamReader") || type.contains("FileInputStream")) {
-			id = "Input";
-		} else {
+		if(id.equals("")) {
 			id = "Output";
-		}		
+		}
+				
+		//if(type.contains("BufferedReader") || type.contains("Scanner") || type.contains("ServletRequest") || type.contains("InputStreamReader") || type.contains("FileInputStream")) {
+		//	id = "Input";
+		//} else {
+		///	id = "Output";
+		//}		
 		return id;
 	}
 

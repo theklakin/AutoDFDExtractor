@@ -28,7 +28,8 @@ public class SpecificDFD {
 		System.out.println("Object SpecificDFD is created");
 	}
 	
-	public void creteSpecificDFD() {		
+	public void creteSpecificDFD() {
+		List<String> aliased = getAllAliasing();
 		BufferedReader br = null;
 		FileReader fr = null;
 		String sCurrentLine;
@@ -66,12 +67,9 @@ public class SpecificDFD {
 						if(sCurrentLine.contains(variable)) {
 							flows.add(sCurrentLine);
 						}else{
-							for(Entry<String,HashMap<String,String>> aliasEntry : alias.entrySet()) {
-								HashMap<String,String> valueAlias = aliasEntry.getValue();
-								for(Entry<String,String> subAliasEntry : valueAlias.entrySet()) {
-									if(sCurrentLine.contains(subAliasEntry.getKey()) || sCurrentLine.contains(subAliasEntry.getValue())) {
-										flows.add(sCurrentLine);
-									}
+							for(String s : aliased) {
+								if(sCurrentLine.contains(s)) {
+									flows.add(sCurrentLine);
 								}
 							}
 							
@@ -131,5 +129,20 @@ public class SpecificDFD {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}  		
+	}
+	
+	private List<String> getAllAliasing() {
+		List<String> aliased = new ArrayList<>();
+		for(Entry<String,HashMap<String,String>> aliasEntry : alias.entrySet()) {
+			HashMap<String,String> valueAlias = aliasEntry.getValue();
+			for(Entry<String,String> ali : valueAlias.entrySet()) {
+				if(variable.equals(ali.getKey())) {
+					aliased.add(ali.getValue());
+				}else if(variable.equals(ali.getValue())) {
+					aliased.add(ali.getKey());
+				}
+			}
+		}		
+		return aliased;
 	}
 }

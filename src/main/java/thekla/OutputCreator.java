@@ -17,7 +17,7 @@ import com.github.javaparser.ast.PackageDeclaration;
 public class OutputCreator {
 	
 	OutputCreator(){
-		System.out.println("Object OutputCreator created!!");
+		//System.out.println("Object OutputCreator created!!");
 	}
 	
 	public String createOutputFile(String input) {
@@ -62,22 +62,10 @@ public class OutputCreator {
 			bw.println();
 			//for (Entry<Entry<String,String>, String> entry : flows.entrySet()) {
 			for(Entry<Integer, String> entry : flowsName.entrySet()) {
-				//String[] temp = s.split("\\\\");
-				//String[] temp2 = temp[temp.length-1].split("\\.");
-				//String specification = temp2[0];
 				int i = entry.getKey();
 				String from = flowsFrom.get(i);
 				String to = flowsTo.get(i);
-				//Entry<String,String> inside = entry.getKey();
-				//String direction = "";
-				//String t = inside.getValue();
-				//if(t.contains("from")) {
-				//	direction = "to";
-				//}else {
-				//	direction = "from";
-				//}
 				bw.println(from + " " + to + " with the name: " + entry.getValue());
-				//bw.println("There is a flow " + direction + " " + specification + "_" + inside.getKey() + " " + inside.getValue() + " with the name: " + entry.getValue());				
 			}
 			bw.println();
 			bw.close();

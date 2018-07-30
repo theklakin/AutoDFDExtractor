@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.util.Map.Entry;
 
 import com.github.javaparser.JavaParser;
@@ -36,12 +39,9 @@ public class App
 		List<String> dependencyJars = dependencies.getDependencies();
 		System.out.println("Please insert the path to the src file under inspection.");
 		//and read his/her input
-		//scanner = new Scanner (System.in);
 		String name = scanner.next();	
-		//System.out.println("Please insert the path to the src file dependency.");
-		//scanner = new Scanner (System.in);
-		//String dependency = scanner.next();	
-		//scanner.close();
+		//now the procedure starts... time it
+		long startTime = System.nanoTime();
 		//create a file that keeps all the relevant information
         OutputCreator output = new OutputCreator();
 		FileTraversal fileTraverse = new FileTraversal();
@@ -53,6 +53,11 @@ public class App
 		
 		// creates an input stream for the file to be parsed
         FileInputStream in;
+        
+        //get input/output libs
+        InOut inOut = new InOut();
+        List<String> inputLibs = inOut.getInputLibs();
+        List<String> outputLibs = inOut.getOutputLibs();
         
         HashMap<Entry<String,String>, Entry<String, String>> methodCallTrace = new HashMap<>();
         HashMap<String,HashMap<String,String>> alias = new HashMap<>();
@@ -89,17 +94,13 @@ public class App
 		        CompilationUnit cu = JavaParser.parse(in);
 		        cu.removeComment();
 		        
-		        //String[] fileParts = s.split("\\\\");
-		        //String[] fname = fileParts[fileParts.length-1].split("\\.");
-		        
 		        info.information(cu, typeSolver);
 		        List<InfoContainer> allDFDInfo = new ArrayList<>();
 		        allDFDInfo = info.getDFDs();	
 		        packages.add(info.getPackage());
 				
 		        //now i need to get flows
-				DataFlowExtractor dataFlow = new DataFlowExtractor(allDFDInfo,className);
-				//HashMap< Entry<String,String>, String> flows = new HashMap<>();
+				DataFlowExtractor dataFlow = new DataFlowExtractor(allDFDInfo,className, inputLibs, outputLibs);
 				HashMap<Integer, String> flowsFrom = new HashMap<>();
 				HashMap<Integer, String> flowsTo = new HashMap<>();
 				HashMap<Integer, String> flowsName = new HashMap<>();
@@ -107,13 +108,13 @@ public class App
 				flowsFrom = dataFlow.getFlowsFrom();
 				flowsTo = dataFlow.getFlowsTo();
 				flowsName = dataFlow.getFlowsName();
-				//flows = dataFlow.getFlows();
 				HashMap<String,String> temp2 = dataFlow.getSubDFDs();
 				
 				for(Entry<String,String> entry : temp2.entrySet()) {
 					subDFD.put(i, entry);
 					i++;
 				}			
+				
 				HashMap<String,String> dataStores = dataFlow.getDataStores();
 				Optional<PackageDeclaration> pack = info.getPackage();
 				methodCallTrace = dataFlow.getTrace();
@@ -152,10 +153,13 @@ public class App
 		finalDFD.extractDFD(subFiles, DFDfileName);
 				
 		DotFileCreator dotFileCreator = new DotFileCreator(DFDfileName, subDFD);
-		//EntireDFDExtractor dfd = new EntireDFDExtractor();
-		//dfd.extractDFD(allMethodNames, packages,fileName);
 		dotFileCreator.createVisualFile();
 		System.out.println("I have finished");
+		long endTime   = System.nanoTime();
+		long totalTime = endTime - startTime;
+		double seconds = (double)totalTime / 1000000000.0;
+		System.out.println("It lasted for: " + seconds + " seconds");
+		System.out.println(TimeUnit.SECONDS.convert(totalTime, TimeUnit.NANOSECONDS));
 		System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
 		String variable = scanner.next();
 		while(!variable.equals("No")) {		

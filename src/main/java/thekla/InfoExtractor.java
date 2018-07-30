@@ -39,7 +39,7 @@ public class InfoExtractor {
 	InfoExtractor(String className){
 		index = 0;
 		this.className = className;
-		System.out.println("Object InfoExtractor is created");
+		//System.out.println("Object InfoExtractor is created");
 		allDFDInfo = new ArrayList<>();
 	}
 	
@@ -87,7 +87,6 @@ public class InfoExtractor {
         		        
         //returns the package
         pack = cu.getPackageDeclaration();
-        //packages.add(pack);
         
         HashMap<SimpleName, List<Statement>> methodStmnt = new HashMap<>();
         List<TypeDeclaration<?>> field = cu.getTypes();	        
@@ -125,16 +124,7 @@ public class InfoExtractor {
 		}
 		
 		HashMap<SimpleName,HashMap<Statement,String>> orderedMethodCalls = orderMethodCalls(methodNames, methods);
-		//createInfoFile(file, libraries, fields2, allMethodNames, methodStmnt, orderedMethodCalls);
 		inform(libraries, fields2, allMethodNames, methodStmnt, orderedMethodCalls);
-		//printAllInfoDFD();
-	}
-	
-	private void printAllInfoDFD() {
-		for(InfoContainer dfd : allDFDInfo) {
-			System.out.println("This is the information regarding the " + dfd.getMethodName());
-			System.out.println("It has statements " + dfd.getMethodStmnt());
-		}
 	}
 	
 	private void inform(List<ImportDeclaration> libraries, HashMap<String, String> fields, HashMap<SimpleName,List<Parameter>> allMethodNames,  HashMap<SimpleName, List<Statement>> methodStmnt, HashMap<SimpleName,HashMap<Statement,String>> orderedMethodCalls){
@@ -172,6 +162,7 @@ public class InfoExtractor {
 			for(Entry<String,String> fEntry: fields.entrySet()) {
 				inputs.add(fEntry.getKey());
 			}
+			
 			dfd.setInputs(inputs);
 			dfd.setPack(pack);
 			dfd.setClassName(className);
@@ -267,6 +258,4 @@ public class InfoExtractor {
 			collector.put(md.getName(),md.getParameters());		
 		}
 	}
-	
-
 }

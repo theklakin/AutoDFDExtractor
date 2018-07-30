@@ -14,11 +14,10 @@ public class EntireDFDExtractor {
 	
 	EntireDFDExtractor(List<String> packages){
 		this.packages = packages;
-		System.out.println("Object EntireDFDExtractor is created");
+		//System.out.println("Object EntireDFDExtractor is created");
 	}
 	
 	public void extractDFD(List<String> subFiles, String DFDFileName) {
-		//String fileName = ""; //the file containing the entire DFD
 		String sCurrentLine;
 		BufferedReader br = null;
 		FileReader fr = null;
@@ -35,29 +34,31 @@ public class EntireDFDExtractor {
 		OutputCreator finalFile = new OutputCreator();
 		
 		try {
-			//String file = "sub"+fileName;
 			for(String file : subFiles) {
 				fr = new FileReader(file);
 				br = new BufferedReader(fr);
 
 				while ((sCurrentLine = br.readLine()) != null) {
-					if(sCurrentLine.contains("The following information is about")) {
+					/*if(sCurrentLine.contains("The following information is about")) {
 						externalEntityFlag =false;
 						fieldsFlag =false;
 						flowsFlag =false;
 						continue;
-					}
+					}*/
 					if(sCurrentLine.contains("The external entities are:")) {
 						externalEntityFlag = true;
 						flowsFlag = false;
+						fieldsFlag =false;
 						continue;
 					}else if(sCurrentLine.contains("The fields are:")) {
 						externalEntityFlag = false;
 						fieldsFlag = true;
+						flowsFlag = false;
 						continue;
 					}else if(sCurrentLine.contains("The flows are:")) {
 						fieldsFlag = false;
 						flowsFlag = true;
+						externalEntityFlag = false;
 						continue;
 					}
 					
@@ -72,7 +73,6 @@ public class EntireDFDExtractor {
 					}
 				}
 				
-				//externalEntities.addAll(hs);
 				for(String externalEntity : externalEntities) {
 					boolean contain = checkExternalEntities(externalEntity);
 					if(!contain) {
@@ -100,20 +100,28 @@ public class EntireDFDExtractor {
 	
 	private String checkFlows(String flow) {
 		String updatedFlow = "";
+		boolean flag = true;
 		
 		for(String pack : packages) {
 			if(flow.contains(pack)) {
 				String[] flowParts = flow.split(" ");
 				for(int i=0;i<flowParts.length;i++) {
-					if(flowParts[i].contains(pack)) {
-						String[] temp2 = flowParts[i].split("\\.");
-						if(temp2[0].equals(pack)) {
-							String prefix = temp2[1];
-							String component = getComponent(flowParts, i, prefix);
-							updatedFlow = updatedFlow + " " + component;
+					if(flowParts[i].equals("name:")) {
+						flag=false;
+					}
+					if(flag) {
+						if(flowParts[i].contains(pack)) {
+							String[] temp2 = flowParts[i].split("\\.");
+							if(temp2[0].equals(pack)) {
+								String prefix = temp2[1];
+								String component = getComponent(flowParts, i, prefix);
+								updatedFlow = updatedFlow + " " + component;
+							}else {
+								updatedFlow = updatedFlow + " " + flowParts[i];
+							}
 						}else {
 							updatedFlow = updatedFlow + " " + flowParts[i];
-						}
+						}						
 					}else {
 						updatedFlow = updatedFlow + " " + flowParts[i];
 					}
@@ -125,8 +133,13 @@ public class EntireDFDExtractor {
 	
 	private String getComponent(String[] flowParts, int i, String prefix) {
 		String component = "";
+		String methodName = "";
 		//part1: name of the method
-		String methodName = flowParts[flowParts.length-1];
+		for(int j =0; j<flowParts.length-1;j++) {
+			if(flowParts[j].equals("name:")) {
+				methodName = flowParts[j+1];
+			}
+		}
 		String[] temp = methodName.split("\\(");
 		String method = temp[0];
 		
