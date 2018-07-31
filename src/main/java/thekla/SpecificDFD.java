@@ -19,12 +19,14 @@ public class SpecificDFD {
 	private String variable;
 	private HashMap<Entry<String,String>, Entry<String,String>> methodCallTrace; //HashMap<Entry<fromM,toM>,<passedData,parameterAlias>>
 	private HashMap<String,HashMap<String,String>> alias ;
+	private int threshold;
 	
-	SpecificDFD(String file, String variable, HashMap<Entry<String,String>, Entry<String,String>> methodCallTrace, HashMap<String,HashMap<String,String>> alias){
+	SpecificDFD(String file, String variable, HashMap<Entry<String,String>, Entry<String,String>> methodCallTrace, HashMap<String,HashMap<String,String>> alias, int threshold){
 		this.file = file;
 		this.variable = variable;
 		this.methodCallTrace = methodCallTrace;
 		this.alias = alias;
+		this.threshold = threshold;
 		System.out.println("Object SpecificDFD is created");
 	}
 	
@@ -124,7 +126,7 @@ public class SpecificDFD {
 			bw.close();
 			
 			HashMap<Integer,Entry<String,String>> subDFD = new HashMap<>();
-			DotFileCreator subDFDVis = new DotFileCreator(fileName, subDFD);
+			DotFileCreator subDFDVis = new DotFileCreator(fileName, subDFD, threshold);
 			subDFDVis.createVisualFile();
 		} catch (IOException e) {
 			e.printStackTrace();

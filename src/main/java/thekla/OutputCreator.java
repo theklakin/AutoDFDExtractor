@@ -10,6 +10,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.PackageDeclaration;
 
@@ -34,7 +39,7 @@ public class OutputCreator {
 		return output;
 	}
 
-	public void writeOutput(Optional<PackageDeclaration> pack, List<ImportDeclaration> libraries, HashMap<String, String> fields, HashMap<Integer, String> flowsFrom, HashMap<Integer, String> flowsTo, HashMap<Integer, String> flowsName, String fileName, String s) {		
+	public void writeOutput(Optional<PackageDeclaration> pack, List<ImportDeclaration> libraries, Set<String> restLibs, HashMap<String, String> fields, HashMap<Integer, String> flowsFrom, HashMap<Integer, String> flowsTo, HashMap<Integer, String> flowsName, String fileName, String s) {		
 		try {
 			//fileName = "sub" + fileName;
 			PrintWriter bw = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
@@ -45,7 +50,10 @@ public class OutputCreator {
 			bw.println();
 			for(ImportDeclaration si : libraries) {
 				bw.println(si.getNameAsString());
-			}			
+			}	
+			for(String sl : restLibs) {
+				bw.println(sl);
+			}	
 			bw.println();
 			bw.println("The fields are: ");
 			bw.println();
@@ -72,6 +80,77 @@ public class OutputCreator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}       		
+	}
+	
+	public void writeDFDAsXML(Set<String> externalEntities, Set<String> flows, List<String> dataStores, String fileName) {
+		Element root = new Element("Entire_DFD");
+        Document doc = new Document(root);
+		Element title = new Element(fileName);
+		Element external = new Element("External_Entities");
+		for(String s: externalEntities) {
+			Element entity = new Element("External_Entity");
+			entity.setText(s);
+			external.addContent(entity);
+		}
+		
+		Element data = new Element("Data_Stores");
+		for(String s: dataStores) {
+			Element store = new Element("Data_Store");
+			store.setText(s);
+			data.addContent(store);
+		}
+		
+		Element flow = new Element("Data_Flows");
+		for(String s: flows) {
+			String[] fParts = s.split(" ");
+			String from = "";
+			String to = "";
+			String name = "";
+			for(int i=0; i<fParts.length-1; i++) {
+				if(fParts[i].equals("from")) {
+					from = fParts[i+1];
+				}
+				if(fParts[i].equals("to")) {
+					to = fParts[i+1];
+				}
+				if(fParts[i].equals("name:")) {
+					name = fParts[i+1];
+				}
+			}
+			
+			Element dFlow = new Element("Data_Flow");
+			Element f = new Element("From");
+			f.setText(from);
+			Element t = new Element("To");
+			t.setText(to);
+			Element n = new Element("Name");
+			n.setText(name);
+			dFlow.addContent(f);
+			dFlow.addContent(t);
+			dFlow.addContent(n);
+			flow.addContent(dFlow);
+		}
+					
+		title.addContent(external);
+		title.addContent(data);
+		title.addContent(flow);
+
+		try {
+			doc.getRootElement().addContent(title);
+			//Create an XML Outputter
+			XMLOutputter outputter = new XMLOutputter();
+			
+			//Set the format of the outputted XML File
+			Format format = Format.getPrettyFormat();
+			outputter.setFormat(format);
+			
+			//Output the XML File to standard output and the desired file
+			FileWriter filew = new FileWriter("entire_dfd.xml");
+			outputter.output(root, filew);
+			
+		} catch (IOException e){
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public void writeEntireDFD(Set<String> externalEntities, Set<String> flows, List<String> dataStores, String fileName) {

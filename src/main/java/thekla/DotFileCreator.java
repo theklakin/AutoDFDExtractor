@@ -2,6 +2,7 @@ package thekla;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,6 +12,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 
@@ -29,20 +38,26 @@ public class DotFileCreator {
 	private HashMap<Integer, String> toFlows;
 	private HashMap<Integer, String> nameFlows;
 	private HashMap<String,Integer> frequency;
+	private int threshold;
+	private HashMap<Entry<String,String>, Entry<String,Integer>> aggregate;
+	private HashMap<Entry<String,String>,String> aggregateFile;
 	
-	DotFileCreator(String file, HashMap<Integer,Entry<String,String>> subDFD){
+	DotFileCreator(String file, HashMap<Integer,Entry<String,String>> subDFD, int threshold){
 		this.file = file;
 		this.subDFD = subDFD;
+		this.threshold = threshold;
 		externalEntities = new ArrayList<>();
 		shapes = new HashMap<>();
 		abstractShapes = new HashMap<>();
 		visual = new HashMap<>();
+		aggregate = new HashMap<>();
 		groupedFlows = new HashMap<>();
 		abstractFlows = new HashMap<>();
 		fromFlows = new HashMap<>();
 		toFlows = new HashMap<>();
 		nameFlows = new HashMap<>();
 		frequency = new HashMap<>();
+		aggregateFile = new HashMap<>();
 		index = 0;
 		//System.out.println("DotFileCreator Object is created");
 	}
@@ -139,7 +154,8 @@ public class DotFileCreator {
 			initializeGroupedFlows();
 			//initializeAbstractFlows();
 			intermediateView(); 
-			abstractView();
+			//abstractView();
+			intermediateView2();
 		}
 	}
 	
@@ -192,6 +208,93 @@ public class DotFileCreator {
 		}
 	}
 	
+	public void intermediateView2() {
+		String fileName = "Intermediate_View_2_" + file + ".gv";
+		String DFDfile = "Intermediate_View_2_" + file;
+		try {
+			PrintWriter v = new PrintWriter(new BufferedWriter(new FileWriter(fileName)));
+			v.println("digraph G{");
+			for(Entry<Entry<String,String>,Entry<String,Integer>> entry : aggregate.entrySet()) {
+				Entry<String,String> flow = entry.getKey();
+				String to = flow.getValue();
+				String from = flow.getKey();
+				Entry<String,Integer> name = entry.getValue();
+				int freq = name.getValue();
+				String labName = name.getKey();
+				if(freq<=threshold) {
+					to = to + " [label=\"" + labName +"\"];";					
+				}else {
+					//String fName = from + "_" + to;
+					aggregateFile.put(new SimpleEntry(from, to), labName);
+					//labelFile(from,to, labName);
+					to = to + " [label=\"" + freq +"\"];";
+				}
+				from = from + " ->";
+				v.println("    " + from + " " + to);
+			}
+			v.println();
+			v.println();
+			
+			for(Entry<String,String> entry : shapes.entrySet()) {
+				v.println("    " + entry.getKey() + " [shape=" + entry.getValue() + "];");
+			}			
+			v.println("}");
+			v.close();
+			createImage(fileName, DFDfile);
+			createXML();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void createXML() {
+		Element root = new Element("Aggregated_Flows");
+        Document doc = new Document(root);
+		Element title = new Element("AggregatedDataFlows");
+		for(Entry<Entry<String,String>,String> entry : aggregateFile.entrySet()) {
+			Entry<String,String> names = entry.getKey();
+			String lName = entry.getValue();
+			String from = names.getKey();
+			String to = names.getValue();
+			Element source = new Element("From");
+			source.setText(from);
+			Element dest = new Element("To");
+			dest.setText(to);
+			Element flows = new Element("data_flows");
+			String[] labelNameParts = lName.split("\\|");
+			for(String s:labelNameParts) {
+				if(s.isEmpty()) {
+					continue;
+				}
+				Element flow = new Element("data_flow_");
+				//Element f = flows.addContent("flow");
+				//Element f = flows.addContent("data_flow");
+				flow.setText(s);
+				flows.addContent(flow);
+			}			
+			title.addContent(source);
+			title.addContent(dest);
+			title.addContent(flows);
+		}
+
+		try {
+			doc.getRootElement().addContent(title);
+			//Create an XML Outputter
+			XMLOutputter outputter = new XMLOutputter();
+			
+			//Set the format of the outputted XML File
+			Format format = Format.getPrettyFormat();
+			outputter.setFormat(format);
+			
+			//Output the XML File to standard output and the desired file
+			FileWriter filew = new FileWriter("aggregate_flows.xml");
+			outputter.output(root, filew);
+			
+		} catch (IOException e){
+			System.out.println(e.getMessage());
+		}
+	}
+	
 	private void initializeGroupedFlows() {
 		int subIndex = 0;
 		Set<String> gFlows = new HashSet<>();
@@ -214,6 +317,7 @@ public class DotFileCreator {
 			String to = flowParts[1];
 			String labelName = getLabel(from, to);
 			labelName = labelName.replace("+", "");
+			aggregate.put(new SimpleEntry(from, to), new SimpleEntry(labelName,counter));
 			String from2 = from + " ->";
 			String abstractFrom = abstractName(from2);
 			if(abstractFrom.isEmpty()) {

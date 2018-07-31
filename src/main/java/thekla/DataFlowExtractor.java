@@ -30,6 +30,7 @@ public class DataFlowExtractor {
 	private String description;
 	private List<String> inputLibs;
 	private List<String> outputLibs;
+	private List<String> inoutLib;
 	
 	DataFlowExtractor(List<InfoContainer> allDFDInfo, String s, List<String> inputLibs, List<String> outputLibs){
 		description = s;
@@ -44,6 +45,7 @@ public class DataFlowExtractor {
 		flowsFrom = new HashMap<>();
 		flowsTo = new HashMap<>();
 		flowsName = new HashMap<>();
+		setInoutLib(new ArrayList<>());
 		index = 0;
 		
 		for(InfoContainer dfd : allDFDInfo) {
@@ -165,7 +167,7 @@ public class DataFlowExtractor {
 						}
 						inputs.add(localVar);
 					} 
-					component = belongsTo(type,externalEntities);
+					component = belongsTo(type);
 					break;
 				case "Output" :
 					boolean contain = checkState(state,inputs);
@@ -187,7 +189,7 @@ public class DataFlowExtractor {
 					if(contain) {
 						//component = belongsToMethod(statement, type, methodName);							
 						if(component.equals("")) {
-							component = belongsTo(type,externalEntities);
+							component = belongsTo(type);
 						}
 					}
 					break;
@@ -195,7 +197,8 @@ public class DataFlowExtractor {
 					System.out.println("Default state");
 				}
 				
-				boolean out = type.contains("sql") || type.contains("File");
+				//boolean out = type.contains("sql") || type.contains("File");
+				boolean out = isOutput(type);
 															
 				if(state.contains("=") && !out) {
 					flag=true;
@@ -252,6 +255,17 @@ public class DataFlowExtractor {
 		//finalFlows.putAll(inspectFlows(flows));
 		allAlias.put(methodName, methodAlias);		
 		//return finalFlows;
+	}
+	
+	private boolean isOutput(String type) {
+		boolean out = false;		
+		for(String s : outputLibs) {
+			if(type.contains(s)) {
+				out = true;
+				break;
+			}
+		}		
+		return out;
 	}
 	
 	private String inputAlias(String statement, List<String> inputs) {
@@ -325,7 +339,7 @@ public class DataFlowExtractor {
 		return id;
 	}
 
-	private String belongsTo(String type, List<ImportDeclaration> libraries) {
+	private String belongsTo(String type) {
 		String[] typeParts = type.split("\\(");
 		String[] typeEntities = typeParts[0].split("\\.");
 		String typeCheck = typeEntities[typeEntities.length-1]; 
@@ -333,7 +347,7 @@ public class DataFlowExtractor {
 
 		String entity = "";
 		
-		for(ImportDeclaration library : libraries) {	
+		for(ImportDeclaration library : externalEntities) {	
 			String lib = library.getNameAsString();
 			String lib2 = "";
 			if(lib.equals("javax.servlet.http.HttpServletRequest")) {
@@ -353,6 +367,27 @@ public class DataFlowExtractor {
 				}
 			}
 		}
+		
+		if(entity.equals("")) {
+			for(String s: inputLibs) {
+				if(typeParts[0].contains(s)) {
+					entity = s;
+					inoutLib.add(s);
+					break;
+				}
+			}
+		}
+		
+		if(entity.equals("")) {
+			for(String s: outputLibs) {
+				if(typeParts[0].contains(s)) {
+					entity = s;
+					inoutLib.add(s);
+					break;
+				}
+			}
+		}
+
 		
 		if(entity.equals("")) {
 			//entity = typeCheck;
@@ -473,6 +508,14 @@ public class DataFlowExtractor {
 			flag=true;
 		}
 		return flag;
+	}
+
+	public List<String> getInoutLib() {
+		return inoutLib;
+	}
+
+	public void setInoutLib(List<String> inoutLib) {
+		this.inoutLib = inoutLib;
 	}
 	
 }

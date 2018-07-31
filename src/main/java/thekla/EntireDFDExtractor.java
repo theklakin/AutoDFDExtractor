@@ -96,6 +96,7 @@ public class EntireDFDExtractor {
 		hsEE.addAll(finalExternalEntities);
 		hsF.addAll(finalFlows);
 		finalFile.writeEntireDFD(hsEE, hsF, dataStores, DFDFileName);
+		finalFile.writeDFDAsXML(hsEE, hsF, dataStores, DFDFileName);
 	}
 	
 	private String checkFlows(String flow) {

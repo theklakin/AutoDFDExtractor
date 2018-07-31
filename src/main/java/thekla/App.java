@@ -4,13 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.Map.Entry;
 
@@ -32,7 +32,7 @@ public class App
 		//get the dependencies
 		System.out.println("Please insert the path to the dependency file.");
 		//and read his/her input
-		Scanner scanner = new Scanner (System.in);
+		Scanner scanner = new Scanner(System.in);
 		String path = scanner.next();	
 		Dependencies dependencies = new Dependencies(path);
 		dependencies.addDependencies();
@@ -40,6 +40,9 @@ public class App
 		System.out.println("Please insert the path to the src file under inspection.");
 		//and read his/her input
 		String name = scanner.next();	
+		System.out.println("Please insert the threshold of aggregation.");
+		//and read his/her input
+		int threshold = scanner.nextInt();
 		//now the procedure starts... time it
 		long startTime = System.nanoTime();
 		//create a file that keeps all the relevant information
@@ -78,7 +81,7 @@ public class App
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\alias\\Alias\\src\\")));
-				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\qatch\\qatch\\src\\")));
+				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\qatch\\qatch\\src\\")));
 				try {
 					for(String jar: dependencyJars) {
 						typeSolver.add(new JarTypeSolver(jar));
@@ -135,7 +138,9 @@ public class App
 					}
 				}*/
 				List<ImportDeclaration> libraries = dataFlow.getExternalEntities();
-				output.writeOutput(pack, libraries, dataStores, flowsFrom, flowsTo, flowsName, fileName,s);
+				List<String> tLibs = dataFlow.getInoutLib();
+				Set<String> restLibs = new HashSet<String>(tLibs);
+				output.writeOutput(pack, libraries, restLibs, dataStores, flowsFrom, flowsTo, flowsName, fileName,s);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -152,7 +157,7 @@ public class App
 		EntireDFDExtractor finalDFD = new EntireDFDExtractor(pack);
 		finalDFD.extractDFD(subFiles, DFDfileName);
 				
-		DotFileCreator dotFileCreator = new DotFileCreator(DFDfileName, subDFD);
+		DotFileCreator dotFileCreator = new DotFileCreator(DFDfileName, subDFD, threshold);
 		dotFileCreator.createVisualFile();
 		System.out.println("I have finished");
 		long endTime   = System.nanoTime();
@@ -163,7 +168,7 @@ public class App
 		System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
 		String variable = scanner.next();
 		while(!variable.equals("No")) {		
-				SpecificDFD specDFD = new SpecificDFD(DFDfileName, variable, methodCallTrace, alias);
+				SpecificDFD specDFD = new SpecificDFD(DFDfileName, variable, methodCallTrace, alias, threshold);
 				specDFD.creteSpecificDFD();
 				System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
 				variable = scanner.next();
