@@ -79,7 +79,7 @@ public class App
 				InfoExtractor info = new InfoExtractor(className);
 				CombinedTypeSolver typeSolver = new CombinedTypeSolver();
 				typeSolver.add(new ReflectionTypeSolver(false));	
-				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
+				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\alias\\Alias\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\qatch\\qatch\\src\\")));

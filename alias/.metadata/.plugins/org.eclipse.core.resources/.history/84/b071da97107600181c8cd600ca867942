@@ -1,0 +1,19 @@
+package App;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import Helper.AliasHelper;
+
+public class Alias {
+	
+	private static final String FIELD_NAME = "name";
+
+    protected void doGet(String req, String resp) throws IOException {
+       String name = FIELD_NAME; 
+       String str = name;
+	   //AliasHelper k = new AliasHelper();
+	   String test = AliasHelper.getDescription(str);
+    }
+
+}

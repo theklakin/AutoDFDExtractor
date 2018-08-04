@@ -1,0 +1,14 @@
+package Helper;
+
+public class AliasHelper {
+	
+	AliasHelper() {
+		System.out.println("Done");
+    }
+
+	public String getDescription(String s) {
+		System.out.println(s);
+        return "simple test of field assignment";
+    }
+
+}

@@ -1,0 +1,22 @@
+package App;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class Alias {
+	
+	private static final String FIELD_NAME = "name";
+
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+       String name = req.getParameter(FIELD_NAME);
+       String str = name;
+	   AliasHelper k = new AliasHelper();
+	   String test = k.getDescription(str);
+       PrintWriter writer = resp.getWriter();
+       writer.println(str);                              /* BAD */
+    }
+
+}
