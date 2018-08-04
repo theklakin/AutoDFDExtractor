@@ -31,20 +31,21 @@ public class App
     {		
 		//get the dependencies
 		System.out.println("Please insert the path to the dependency file.");
-		//and read his/her input
 		Scanner scanner = new Scanner(System.in);
 		String path = scanner.next();	
 		Dependencies dependencies = new Dependencies(path);
 		dependencies.addDependencies();
 		List<String> dependencyJars = dependencies.getDependencies();
+		
 		System.out.println("Please insert the path to the src file under inspection.");
-		//and read his/her input
 		String name = scanner.next();	
+		
 		System.out.println("Please insert the threshold of aggregation.");
-		//and read his/her input
 		int threshold = scanner.nextInt();
+		
 		//now the procedure starts... time it
 		long startTime = System.nanoTime();
+		
 		//create a file that keeps all the relevant information
         OutputCreator output = new OutputCreator();
 		FileTraversal fileTraverse = new FileTraversal();
@@ -81,7 +82,8 @@ public class App
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\alias\\Alias\\src\\")));
-				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\qatch\\qatch\\src\\")));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\qatch\\qatch\\src\\")));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\jerseyApp\\messenger-master\\src\\main\\java\\org\\koushik\\javabrains\\messenger\\")));
 				try {
 					for(String jar: dependencyJars) {
 						typeSolver.add(new JarTypeSolver(jar));
@@ -160,11 +162,13 @@ public class App
 		DotFileCreator dotFileCreator = new DotFileCreator(DFDfileName, subDFD, threshold);
 		dotFileCreator.createVisualFile();
 		System.out.println("I have finished");
+		
 		long endTime   = System.nanoTime();
 		long totalTime = endTime - startTime;
 		double seconds = (double)totalTime / 1000000000.0;
 		System.out.println("It lasted for: " + seconds + " seconds");
 		System.out.println(TimeUnit.SECONDS.convert(totalTime, TimeUnit.NANOSECONDS));
+		
 		System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
 		String variable = scanner.next();
 		while(!variable.equals("No")) {		

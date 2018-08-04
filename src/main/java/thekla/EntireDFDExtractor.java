@@ -12,9 +12,12 @@ public class EntireDFDExtractor {
 	
 	private List<String> packages;
 	
+	EntireDFDExtractor(){
+		System.out.println("Object EntireDFDExtractor is created");
+	}
+	
 	EntireDFDExtractor(List<String> packages){
 		this.packages = packages;
-		//System.out.println("Object EntireDFDExtractor is created");
 	}
 	
 	public void extractDFD(List<String> subFiles, String DFDFileName) {

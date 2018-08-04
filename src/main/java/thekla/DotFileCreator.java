@@ -2,7 +2,6 @@ package thekla;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,8 +14,6 @@ import java.util.Set;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -42,6 +39,10 @@ public class DotFileCreator {
 	private HashMap<Entry<String,String>, Entry<String,Integer>> aggregate;
 	private HashMap<Entry<String,String>,String> aggregateFile;
 	
+	DotFileCreator(){
+		System.out.println("DotFileCreator Object is created");
+	}
+	
 	DotFileCreator(String file, HashMap<Integer,Entry<String,String>> subDFD, int threshold){
 		this.file = file;
 		this.subDFD = subDFD;
@@ -59,7 +60,6 @@ public class DotFileCreator {
 		frequency = new HashMap<>();
 		aggregateFile = new HashMap<>();
 		index = 0;
-		//System.out.println("DotFileCreator Object is created");
 	}
 	
 	public void createVisualFile() {
@@ -118,9 +118,7 @@ public class DotFileCreator {
 						String from2 = check(from);
 						String to2 = check(to);
 						name = chackName(name);
-						
-						//System.out.println("from: " + from2 + " to: " + to2);
-						
+												
 						if(from2.equals("") || to2.equals("") || name.equals("")) {
 							continue;
 						}
@@ -152,9 +150,8 @@ public class DotFileCreator {
 		detailedView();
 		if(!subDFD.isEmpty()) {
 			initializeGroupedFlows();
-			//initializeAbstractFlows();
 			intermediateView(); 
-			//abstractView();
+			abstractView();
 			intermediateView2();
 		}
 	}
@@ -224,9 +221,7 @@ public class DotFileCreator {
 				if(freq<=threshold) {
 					to = to + " [label=\"" + labName +"\"];";					
 				}else {
-					//String fName = from + "_" + to;
 					aggregateFile.put(new SimpleEntry(from, to), labName);
-					//labelFile(from,to, labName);
 					to = to + " [label=\"" + freq +"\"];";
 				}
 				from = from + " ->";
@@ -241,57 +236,10 @@ public class DotFileCreator {
 			v.println("}");
 			v.close();
 			createImage(fileName, DFDfile);
-			createXML();
+			OutputCreator out = new OutputCreator();
+			out.createXML(aggregateFile);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-	
-	private void createXML() {
-		Element root = new Element("Aggregated_Flows");
-        Document doc = new Document(root);
-		Element title = new Element("AggregatedDataFlows");
-		for(Entry<Entry<String,String>,String> entry : aggregateFile.entrySet()) {
-			Entry<String,String> names = entry.getKey();
-			String lName = entry.getValue();
-			String from = names.getKey();
-			String to = names.getValue();
-			Element source = new Element("From");
-			source.setText(from);
-			Element dest = new Element("To");
-			dest.setText(to);
-			Element flows = new Element("data_flows");
-			String[] labelNameParts = lName.split("\\|");
-			for(String s:labelNameParts) {
-				if(s.isEmpty()) {
-					continue;
-				}
-				Element flow = new Element("data_flow_");
-				//Element f = flows.addContent("flow");
-				//Element f = flows.addContent("data_flow");
-				flow.setText(s);
-				flows.addContent(flow);
-			}			
-			title.addContent(source);
-			title.addContent(dest);
-			title.addContent(flows);
-		}
-
-		try {
-			doc.getRootElement().addContent(title);
-			//Create an XML Outputter
-			XMLOutputter outputter = new XMLOutputter();
-			
-			//Set the format of the outputted XML File
-			Format format = Format.getPrettyFormat();
-			outputter.setFormat(format);
-			
-			//Output the XML File to standard output and the desired file
-			FileWriter filew = new FileWriter("aggregate_flows.xml");
-			outputter.output(root, filew);
-			
-		} catch (IOException e){
-			System.out.println(e.getMessage());
 		}
 	}
 	
@@ -324,7 +272,7 @@ public class DotFileCreator {
 				abstractFrom = from2;	
 				shape = getSubShape(from2);
 			}else {
-				shape = "box";
+				shape = "ellipse";
 			}
 			String[] fromParts = abstractFrom.split(" ");
 			abstractShapes.put(fromParts[0], shape);
@@ -340,8 +288,6 @@ public class DotFileCreator {
 			String[] toParts = abstractTo.split(" ");
 			abstractShapes.put(toParts[0], shape);
 
-			//to = to + " [label=\"" + labelName +"\"];";
-			//abstractTo = abstractTo + " [label=\"" + labelName +"\"];";
 			to = to + " [label=\"" + counter +"\"];";
 			abstractTo = abstractTo + " [label=\"" + counter +"\"];";
 			subIndex++;
@@ -400,7 +346,6 @@ public class DotFileCreator {
 			labelName = labelName.substring(3);
 		}
 		
-		//labelName = getAbastractLabelName(labelName);
 		return labelName;
 	}			
 	
@@ -448,7 +393,6 @@ public class DotFileCreator {
 		for(Entry<Integer,Entry<String,String>> entry : subDFD.entrySet()) {
 			Entry<String,String> sub = entry.getValue();
 			if(name.contains(sub.getKey())) {
-				//System.out.println("name: " + name);
 				String[] nameParts = name.split(" ");	
 				if(nameParts.length>1) {
 					finalName = sub.getValue() + " " + nameParts[1];
@@ -488,16 +432,6 @@ public class DotFileCreator {
 	
 	private String check(String name) {
 		String newName = name;
-		
-		/*
-		if(name.contains(".")) {
-			if(name.contains("logging")) {
-				newName = "log";
-			} else {
-				String[] nameParts = name.split("\\.");
-				newName = nameParts[nameParts.length-1];
-			}
-		}*/
 		
 		if(name.contains(".")) {
 			newName = name.replace(".", "_");

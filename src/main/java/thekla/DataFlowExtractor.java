@@ -32,6 +32,10 @@ public class DataFlowExtractor {
 	private List<String> outputLibs;
 	private List<String> inoutLib;
 	
+	DataFlowExtractor(){
+		System.out.println("Done DFDExtractor");
+	}
+	
 	DataFlowExtractor(List<InfoContainer> allDFDInfo, String s, List<String> inputLibs, List<String> outputLibs){
 		description = s;
 		this.allDFDInfo = allDFDInfo;
@@ -107,7 +111,7 @@ public class DataFlowExtractor {
 		}	
 	}
 	
-	private void printFounInfo(List<String> inputs, List<String> methodStatements, HashMap<String,String> methodCalls) {
+	/*private void printFounInfo(List<String> inputs, List<String> methodStatements, HashMap<String,String> methodCalls) {
 		//System.out.println("Libraries:");
 		//for(String s : externalEntities) {
 		//	System.out.println(s);
@@ -127,11 +131,9 @@ public class DataFlowExtractor {
 		for(Entry<String,String> entry : methodCalls.entrySet()) {
 			System.out.println("Statement: " + entry.getKey() + " has type: " + entry.getValue());
 		}
-	}
+	}*/
 	
 	private void methodFlows(String methodName, List<String> inputs, List<Statement> methodStatements, HashMap<Integer, Entry<Statement,String>> methodCalls) {
-		//HashMap<Entry<String,String>, String> flows = new HashMap<>();
-		//HashMap<Entry<String,String>, String> finalFlows = new HashMap<>();
 		methodAlias = new HashMap<>();
 		//System.out.println("Method: " + methodName);
 		//printFounInfo(inputs, methodStatements, methodCalls);
@@ -179,15 +181,11 @@ public class DataFlowExtractor {
 						}
 					}
 					
-					//if(type.contains("sql") || type.contains("File")) {
-					//	contain = true;
-					//}
 					String alias = inputAlias(state, inputs);
 					if(!alias.equals("")) {
 						inputs.add(alias);
 					}
 					if(contain) {
-						//component = belongsToMethod(statement, type, methodName);							
 						if(component.equals("")) {
 							component = belongsTo(type);
 						}
@@ -197,7 +195,6 @@ public class DataFlowExtractor {
 					System.out.println("Default state");
 				}
 				
-				//boolean out = type.contains("sql") || type.contains("File");
 				boolean out = isOutput(type);
 															
 				if(state.contains("=") && !out) {
@@ -241,7 +238,6 @@ public class DataFlowExtractor {
 									flowsFrom.put(index, "from " + description + "_" +methodName);
 								}
 							}
-							//flows.put(new SimpleEntry(methodName, entity), flowName);
 						}						
 					}						
 				}									
@@ -252,9 +248,7 @@ public class DataFlowExtractor {
 				}
 			}
 		}					
-		//finalFlows.putAll(inspectFlows(flows));
 		allAlias.put(methodName, methodAlias);		
-		//return finalFlows;
 	}
 	
 	private boolean isOutput(String type) {
@@ -330,12 +324,7 @@ public class DataFlowExtractor {
 		if(id.equals("")) {
 			id = "Output";
 		}
-				
-		//if(type.contains("BufferedReader") || type.contains("Scanner") || type.contains("ServletRequest") || type.contains("InputStreamReader") || type.contains("FileInputStream")) {
-		//	id = "Input";
-		//} else {
-		///	id = "Output";
-		//}		
+			
 		return id;
 	}
 
@@ -387,10 +376,8 @@ public class DataFlowExtractor {
 				}
 			}
 		}
-
-		
+	
 		if(entity.equals("")) {
-			//entity = typeCheck;
 			entity = description + "_" +typeCheck;
 		}
 		return entity;
@@ -474,19 +461,14 @@ public class DataFlowExtractor {
 
 	
 	private String inspectFlows(String entity){
-		//HashMap< Entry<String,String>, String> flow = new HashMap<>();
-		//for(Entry<Entry<String,String>, String> entry : flows.entrySet()) {
-			//String entity = entry.getKey().getValue();
-			//String flowName = entry.getValue();
-			if(entity.contains("sql")) {
-				String[] entityParts = entity.split(" ");
-				entity = entityParts[0] + " database";
-			}
-			if(entity.contains("File")) {
-				String[] entityParts = entity.split(" ");
-				entity = entityParts[0] + " file";
-			}
-		//}		
+		if(entity.contains("sql")) {
+			String[] entityParts = entity.split(" ");
+			entity = entityParts[0] + " database";
+		}
+		if(entity.contains("File")) {
+			String[] entityParts = entity.split(" ");
+			entity = entityParts[0] + " file";
+		}	
 		return entity;
 	}
 	
@@ -496,7 +478,6 @@ public class DataFlowExtractor {
 			flag=true;
 		}
 		if(flowName.contains("(")) {
-			//System.out.println("flow name: " + flowName);
 			String[] sub1 = flowName.split("\\(");
 			String[] sub2 = sub1[1].split("\\)");
 
@@ -516,6 +497,5 @@ public class DataFlowExtractor {
 
 	public void setInoutLib(List<String> inoutLib) {
 		this.inoutLib = inoutLib;
-	}
-	
+	}	
 }

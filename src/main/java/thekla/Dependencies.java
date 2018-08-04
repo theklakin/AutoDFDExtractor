@@ -9,6 +9,10 @@ public class Dependencies {
 	private List<String> depend;
 	private String path;
 	
+	Dependencies(){
+		
+	}
+	
 	Dependencies(String path){
 		this.path=path;
 		depend = new ArrayList<>();

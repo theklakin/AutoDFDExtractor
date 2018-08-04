@@ -35,11 +35,14 @@ public class InfoExtractor {
 	private List<InfoContainer> allDFDInfo;
 	private String className;
 	private Integer index;
+	
+	InfoExtractor(){
+		System.out.println("InfoExtracor created");
+	}
 		
 	InfoExtractor(String className){
 		index = 0;
 		this.className = className;
-		//System.out.println("Object InfoExtractor is created");
 		allDFDInfo = new ArrayList<>();
 	}
 	
@@ -170,7 +173,7 @@ public class InfoExtractor {
 		}
 	}
 	
-	public void createInfoFile(String file, List<ImportDeclaration> libraries, HashMap<String, String> fields, HashMap<SimpleName,List<Parameter>> allMethodNames,  HashMap<SimpleName, List<Statement>> methodStmnt, HashMap<SimpleName,HashMap<Statement,String>> orderedMethodCalls) {
+	/*public void createInfoFile(String file, List<ImportDeclaration> libraries, HashMap<String, String> fields, HashMap<SimpleName,List<Parameter>> allMethodNames,  HashMap<SimpleName, List<Statement>> methodStmnt, HashMap<SimpleName,HashMap<Statement,String>> orderedMethodCalls) {
 		try {
 			String fileName = "Info" + file;
 			PrintWriter bw = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
@@ -230,7 +233,7 @@ public class InfoExtractor {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}       	
-	}
+	}*/
 	
 	private HashMap<SimpleName,HashMap<Statement,String>> orderMethodCalls(HashMap<SimpleName,List<Parameter>> methodNames, HashMap<Entry<SimpleName,Integer>,Entry<String,Statement>> methods){
 		HashMap<SimpleName,HashMap<Statement,String>> ordered = new HashMap<>();
@@ -254,7 +257,6 @@ public class InfoExtractor {
 		
 		public void visit(MethodDeclaration md, HashMap<SimpleName,List<Parameter>> collector) {
 			super.visit(md, collector);
-			//System.out.println(md.getParameters());
 			collector.put(md.getName(),md.getParameters());		
 		}
 	}

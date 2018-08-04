@@ -1,11 +1,8 @@
 package thekla;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,13 +18,16 @@ public class SpecificDFD {
 	private HashMap<String,HashMap<String,String>> alias ;
 	private int threshold;
 	
+	SpecificDFD(){
+		System.out.println("Object SpecificDFD is created");
+	}
+	
 	SpecificDFD(String file, String variable, HashMap<Entry<String,String>, Entry<String,String>> methodCallTrace, HashMap<String,HashMap<String,String>> alias, int threshold){
 		this.file = file;
 		this.variable = variable;
 		this.methodCallTrace = methodCallTrace;
 		this.alias = alias;
 		this.threshold = threshold;
-		System.out.println("Object SpecificDFD is created");
 	}
 	
 	public void creteSpecificDFD() {
@@ -94,43 +94,13 @@ public class SpecificDFD {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		OutputCreator out = new OutputCreator();
+		String fileName = variable + "_DFD";
+		out.writeSpecificDFD(variable, externalEntities, dataStores, flows);
 		
-		try {
-			String fileName = variable + "DFD";
-			PrintWriter bw = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
-			bw.println("This file contains the DFD for the variable " + variable);
-			bw.println();
-			bw.println("The external entities are: ");
-			bw.println();
-			for(String externalEntity : externalEntities) {
-				bw.println(externalEntity);
-			}			
-			bw.println();
-			bw.println("The fields are: ");
-			bw.println();
-			if(dataStores.isEmpty()) {
-				bw.println("There are no fields");
-			}else {
-				for(String dataStore : dataStores) {
-					bw.println(dataStore);
-				}
-			}			
-			bw.println();
-			
-			bw.println("The flows are: ");
-			bw.println();
-			for (String dataFLow : flows) {
-				bw.println(dataFLow);				
-			}
-			bw.println();
-			bw.close();
-			
-			HashMap<Integer,Entry<String,String>> subDFD = new HashMap<>();
-			DotFileCreator subDFDVis = new DotFileCreator(fileName, subDFD, threshold);
-			subDFDVis.createVisualFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}  		
+		HashMap<Integer,Entry<String,String>> subDFD = new HashMap<>();
+		DotFileCreator subDFDVis = new DotFileCreator(fileName, subDFD, threshold);
+		subDFDVis.createVisualFile();
 	}
 	
 	private List<String> getAllAliasing() {

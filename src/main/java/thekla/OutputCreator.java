@@ -22,7 +22,7 @@ import com.github.javaparser.ast.PackageDeclaration;
 public class OutputCreator {
 	
 	OutputCreator(){
-		//System.out.println("Object OutputCreator created!!");
+		
 	}
 	
 	public String createOutputFile(String input) {
@@ -41,9 +41,7 @@ public class OutputCreator {
 
 	public void writeOutput(Optional<PackageDeclaration> pack, List<ImportDeclaration> libraries, Set<String> restLibs, HashMap<String, String> fields, HashMap<Integer, String> flowsFrom, HashMap<Integer, String> flowsTo, HashMap<Integer, String> flowsName, String fileName, String s) {		
 		try {
-			//fileName = "sub" + fileName;
 			PrintWriter bw = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
-	        //bw.println("The following information is about " + pack.get().getNameAsString());
 			bw.println("The following information is about " + s);
 			bw.println();	
 			bw.println("The external entities are: ");
@@ -68,7 +66,6 @@ public class OutputCreator {
 			
 			bw.println("The flows are: ");
 			bw.println();
-			//for (Entry<Entry<String,String>, String> entry : flows.entrySet()) {
 			for(Entry<Integer, String> entry : flowsName.entrySet()) {
 				int i = entry.getKey();
 				String from = flowsFrom.get(i);
@@ -183,5 +180,86 @@ public class OutputCreator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}  
+	}
+	
+	public void createXML(HashMap<Entry<String,String>,String> aggregateFile) {
+		Element root = new Element("Aggregated_Flows");
+        Document doc = new Document(root);
+		Element title = new Element("AggregatedDataFlows");
+		for(Entry<Entry<String,String>,String> entry : aggregateFile.entrySet()) {
+			Entry<String,String> names = entry.getKey();
+			String lName = entry.getValue();
+			String from = names.getKey();
+			String to = names.getValue();
+			Element source = new Element("From");
+			source.setText(from);
+			Element dest = new Element("To");
+			dest.setText(to);
+			Element flows = new Element("data_flows");
+			String[] labelNameParts = lName.split("\\|");
+			for(String s:labelNameParts) {
+				if(s.isEmpty()) {
+					continue;
+				}
+				Element flow = new Element("data_flow_");
+				flow.setText(s);
+				flows.addContent(flow);
+			}			
+			title.addContent(source);
+			title.addContent(dest);
+			title.addContent(flows);
+		}
+
+		try {
+			doc.getRootElement().addContent(title);
+			//Create an XML Outputter
+			XMLOutputter outputter = new XMLOutputter();
+			
+			//Set the format of the outputted XML File
+			Format format = Format.getPrettyFormat();
+			outputter.setFormat(format);
+			
+			//Output the XML File to standard output and the desired file
+			FileWriter filew = new FileWriter("aggregate_flows.xml");
+			outputter.output(root, filew);
+			
+		} catch (IOException e){
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public void writeSpecificDFD(String variable, List<String> externalEntities, List<String> dataStores, Set<String> flows) {
+		try {
+			String fileName = variable + "_DFD";
+			PrintWriter bw = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
+			bw.println("This file contains the DFD for the variable " + variable);
+			bw.println();
+			bw.println("The external entities are: ");
+			bw.println();
+			for(String externalEntity : externalEntities) {
+				bw.println(externalEntity);
+			}			
+			bw.println();
+			bw.println("The fields are: ");
+			bw.println();
+			if(dataStores.isEmpty()) {
+				bw.println("There are no fields");
+			}else {
+				for(String dataStore : dataStores) {
+					bw.println(dataStore);
+				}
+			}			
+			bw.println();
+			
+			bw.println("The flows are: ");
+			bw.println();
+			for (String dataFLow : flows) {
+				bw.println(dataFLow);				
+			}
+			bw.println();
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
 	}
 }
