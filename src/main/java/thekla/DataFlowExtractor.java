@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class DataFlowExtractor {
 	
 	private List<InfoContainer> allDFDInfo = new ArrayList<>();
-	private HashMap<String,String> dataStores;
+	private HashMap<String,String> dataStores; //name-type
 	private List<ImportDeclaration> externalEntities;
 	private List<String> methodNames;
 	private HashMap<Entry<String,String>, Entry<String,String>> methodCallTrace;
@@ -30,17 +30,19 @@ public class DataFlowExtractor {
 	private String description;
 	private List<String> inputLibs;
 	private List<String> outputLibs;
+	private List<String> dsLibs;
 	private List<String> inoutLib;
 	
 	DataFlowExtractor(){
 		System.out.println("Done DFDExtractor");
 	}
 	
-	DataFlowExtractor(List<InfoContainer> allDFDInfo, String s, List<String> inputLibs, List<String> outputLibs){
+	DataFlowExtractor(List<InfoContainer> allDFDInfo, String s, List<String> inputLibs, List<String> outputLibs, List<String> dsLibs){
 		description = s;
 		this.allDFDInfo = allDFDInfo;
 		this.inputLibs = inputLibs;
 		this.outputLibs = outputLibs;
+		this.dsLibs = dsLibs;
 		dataStores = new HashMap<>();
 		externalEntities = allDFDInfo.get(0).getLibraries();
 		methodNames = new ArrayList<>();
@@ -200,14 +202,11 @@ public class DataFlowExtractor {
 				if(state.contains("=") && !out) {
 					flag=true;
 				}
-				//System.out.println("Component= " + component);						
 				if(!component.equals("")) {
 					if(flag) {
 						entity = "from " + component;
 					} else entity = "to " + component;
-					String flowName = "";
-					//System.out.println("entity: " + entity);
-						
+					String flowName = "";						
 					if(id.equals("Input")) {
 						flowName = state;
 					}else {
@@ -220,11 +219,9 @@ public class DataFlowExtractor {
 							flowName = stateParts[stateParts.length-1];
 						}
 					}
-					//System.out.println("flow name: " + flowName);
 					if(!entity.equals("")) {
 						boolean flowFlag = inspectFlow(flowName);
 						if(flowFlag) {
-							//System.out.println("method name=" + methodName);
 							entity = inspectFlows(entity);
 							flowName = inspectFlowName(flowName);
 							if(!flowName.equals("")) {
@@ -258,7 +255,7 @@ public class DataFlowExtractor {
 				out = true;
 				break;
 			}
-		}		
+		}
 		return out;
 	}
 	
@@ -461,14 +458,30 @@ public class DataFlowExtractor {
 
 	
 	private String inspectFlows(String entity){
-		if(entity.contains("sql")) {
+		/*if(entity.contains("sql")) {
 			String[] entityParts = entity.split(" ");
 			entity = entityParts[0] + " database";
+			dataStores.put(entity, "database");
 		}
-		if(entity.contains("File")) {
+		if(entity.contains("File") || entity.contains("XMLOutputter")) {
 			String[] entityParts = entity.split(" ");
 			entity = entityParts[0] + " file";
-		}	
+			dataStores.put(entity, "file");
+		}*/
+		String[] entityParts = entity.split(" ");
+		String entityCheck = entityParts[1];
+		for(String s: dsLibs) {
+			if(entityCheck.equals(s)) {
+				if(entity.contains("sql")) {
+					entity = entityParts[0] + " database";
+					dataStores.put(entity, "database");
+				}else {
+					entity = entityParts[0] + " file";
+					dataStores.put(entity, "file");
+				}
+				break;
+			}
+		}
 		return entity;
 	}
 	

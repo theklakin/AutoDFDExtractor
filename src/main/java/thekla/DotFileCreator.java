@@ -12,11 +12,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 
@@ -112,6 +107,15 @@ public class DotFileCreator {
 								}
 								if(name.contains("\"")){
 									name = name.replace("\"", "");
+								}
+								if(name.contains("+")){
+									name = name.replace("+", "");
+								}
+								if(name.contains("/*")){
+									name = name.replace("/*", "");
+								}
+								if(name.contains("*/")){
+									name = name.replace("*/", "");
 								}
 							}
 						}
@@ -218,8 +222,12 @@ public class DotFileCreator {
 				Entry<String,Integer> name = entry.getValue();
 				int freq = name.getValue();
 				String labName = name.getKey();
+				String nameL = labName;
 				if(freq<=threshold) {
-					to = to + " [label=\"" + labName +"\"];";					
+					//if(labName.length()>40) {
+					//	nameL = labName.substring(0, 40) + "...";
+					//}
+					to = to + " [label=\"" + nameL +"\"];";					
 				}else {
 					aggregateFile.put(new SimpleEntry(from, to), labName);
 					to = to + " [label=\"" + freq +"\"];";
@@ -407,7 +415,7 @@ public class DotFileCreator {
 	public void createImage(String file, String name) {
 		//the command that is going to be given to cmd
 		String dfdName = name + ".jpeg";
-		String command = "dot -Tjpeg " + file +  " -o " + dfdName + " rotate=90";
+		String command = "dot -Tjpeg " + file +  " -o " + dfdName;
 		
 		//put it in the cmd
 		ProcessBuilder builder = new ProcessBuilder("cmd.exe","/c",command);
@@ -426,7 +434,7 @@ public class DotFileCreator {
 		if(name.contains(")") && !name.contains("(")) {
 			String[] nameParts = name.split("\\)");
 			newName = nameParts[0];
-		} 		
+		}
 		return newName;
 	}
 	

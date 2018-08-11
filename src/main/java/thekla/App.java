@@ -62,6 +62,7 @@ public class App
         InOut inOut = new InOut();
         List<String> inputLibs = inOut.getInputLibs();
         List<String> outputLibs = inOut.getOutputLibs();
+        List<String> dsLibs = inOut.getDSLibs();
         
         HashMap<Entry<String,String>, Entry<String, String>> methodCallTrace = new HashMap<>();
         HashMap<String,HashMap<String,String>> alias = new HashMap<>();
@@ -69,6 +70,7 @@ public class App
         List<String> subFiles = new ArrayList<>();
         HashMap<Integer, Entry<String,String>> subDFD = new HashMap<>();
         int i = 0;
+        long intermediateTime = 0;
         
 		try {
 			for(String s : files) {
@@ -79,7 +81,7 @@ public class App
 				InfoExtractor info = new InfoExtractor(className);
 				CombinedTypeSolver typeSolver = new CombinedTypeSolver();
 				typeSolver.add(new ReflectionTypeSolver(false));	
-				typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
+				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\securibench\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\myBenchmark\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\alias\\Alias\\src\\")));
 				//typeSolver.add(new JavaParserTypeSolver(new File("C:\\Users\\thekl\\Desktop\\qatch\\qatch\\src\\")));
@@ -100,12 +102,13 @@ public class App
 		        cu.removeComment();
 		        
 		        info.information(cu, typeSolver);
+		        intermediateTime = System.nanoTime();
 		        List<InfoContainer> allDFDInfo = new ArrayList<>();
 		        allDFDInfo = info.getDFDs();	
 		        packages.add(info.getPackage());
 				
 		        //now i need to get flows
-				DataFlowExtractor dataFlow = new DataFlowExtractor(allDFDInfo,className, inputLibs, outputLibs);
+				DataFlowExtractor dataFlow = new DataFlowExtractor(allDFDInfo,className, inputLibs, outputLibs, dsLibs);
 				HashMap<Integer, String> flowsFrom = new HashMap<>();
 				HashMap<Integer, String> flowsTo = new HashMap<>();
 				HashMap<Integer, String> flowsName = new HashMap<>();
@@ -164,9 +167,12 @@ public class App
 		System.out.println("I have finished");
 		
 		long endTime   = System.nanoTime();
+		long parserTime = intermediateTime - startTime;
 		long totalTime = endTime - startTime;
-		double seconds = (double)totalTime / 1000000000.0;
-		System.out.println("It lasted for: " + seconds + " seconds");
+		double secondsTotal = (double)totalTime / 1000000000.0;
+		double secondsInter = (double)parserTime / 1000000000.0;
+		System.out.println("It lasted for: " + secondsTotal + " seconds");
+		System.out.println("the parser time lasted for: " + secondsInter + " seconds");
 		System.out.println(TimeUnit.SECONDS.convert(totalTime, TimeUnit.NANOSECONDS));
 		
 		System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
