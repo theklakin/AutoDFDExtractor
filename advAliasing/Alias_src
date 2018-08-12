@@ -1,0 +1,27 @@
+The external entities are: 
+
+java.io.PrintWriter
+java.io.PrintStream
+securibench.micro.BasicTestCase
+javax.servlet.http.HttpServletRequest
+javax.servlet.http.HttpServletResponse
+java.io.IOException
+securibench.micro.MicroTestCase
+
+The fields are: 
+
+There are no fields
+There are no fields
+There are no fields
+
+The flows are: 
+
+from Alias_doGet to java.io.PrintWriter with the name: println(str);
+from Test_getDescription to java.io.PrintStream with the name: outprintln(s);
+ from AliasHelper_getDescription to Alias_doGet with the name: getDescription(str);
+ from AliasHelper_getDescription to java.io.PrintStream with the name: outprintln(s);
+from Test_getDescription to Alias_doGet with the name: getDescription(str);
+ The following information is about C:\Users\thekl\Desktop\alias\Alias\src\App\Test.java The following information is about C:\Users\thekl\Desktop\alias\Alias\src\App\Test.java
+ The following information is about C:\Users\thekl\Desktop\alias\Alias\src\Helper\AliasHelper.java
+from javax.servlet.http.HttpServletRequest to Alias_doGet with the name: String name = req.getParameter(FIELD_NAME);
+

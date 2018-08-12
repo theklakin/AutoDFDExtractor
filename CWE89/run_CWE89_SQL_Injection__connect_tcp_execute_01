@@ -1,0 +1,52 @@
+The following information is about C:\Users\thekl\Desktop\myBenchmark\src\testcases\test\run\CWE89_SQL_Injection__connect_tcp_execute_01.java
+
+The external entities are: 
+
+testcasesupport
+javax.servlet.http
+java.io.BufferedReader
+java.io.InputStreamReader
+java.io.IOException
+java.net.Socket
+java.util.logging.Level
+java.sql
+
+The fields are: 
+
+There are no fields
+
+The flows are: 
+
+from java.net.Socket to CWE89_goodB2G with the name: /* read input from socket */
+readerInputStream = new InputStreamReader(socket.getInputStream(), "UTF-8");
+from java.io.BufferedReader to CWE89_goodB2G with the name: data = readerBuffered.readLine();
+from CWE89_goodB2G to Logger_log with the name: exceptIO);
+from CWE89_goodB2G to Logger_log with the name: exceptIO);
+from CWE89_goodB2G to Logger_log with the name: exceptIO);
+from CWE89_goodB2G to Logger_log with the name: exceptIO);
+from CWE89_goodB2G to database with the name: prepareStatement("insert into users (status) values ('updated') where name=?");
+from CWE89_goodB2G to database with the name: setString(1, data);
+from CWE89_goodB2G to testcasesupport with the name: writeLine("Name, " + data + ", updated successfully");
+from CWE89_goodB2G to testcasesupport with the name: writeLine("Unable to update records for user: " + data);
+from CWE89_goodB2G to Logger_log with the name: exceptSql);
+from CWE89_goodB2G to Logger_log with the name: exceptSql);
+from CWE89_goodB2G to Logger_log with the name: exceptSql);
+from CWE89_main to testcasesupport with the name: mainFromParent(args);
+from java.net.Socket to CWE89_bad with the name: /* read input from socket */
+readerInputStream = new InputStreamReader(socket.getInputStream(), "UTF-8");
+from java.io.BufferedReader to CWE89_bad with the name: data = readerBuffered.readLine();
+from CWE89_bad to Logger_log with the name: exceptIO);
+from CWE89_bad to Logger_log with the name: exceptIO);
+from CWE89_bad to Logger_log with the name: exceptIO);
+from CWE89_bad to Logger_log with the name: exceptIO);
+from CWE89_bad to database with the name: execute("insert into users (status) values ('updated') where name='" + data + "'");
+from CWE89_bad to testcasesupport with the name: writeLine("Name, " + data + ", updated successfully");
+from CWE89_bad to testcasesupport with the name: writeLine("Unable to update records for user: " + data);
+from CWE89_bad to Logger_log with the name: exceptSql);
+from CWE89_bad to Logger_log with the name: exceptSql);
+from CWE89_bad to Logger_log with the name: exceptSql);
+from CWE89_goodG2B to database with the name: execute("insert into users (status) values ('updated') where name='" + data + "'");
+from CWE89_goodG2B to Logger_log with the name: exceptSql);
+from CWE89_goodG2B to Logger_log with the name: exceptSql);
+from CWE89_goodG2B to Logger_log with the name: exceptSql);
+

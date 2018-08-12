@@ -1,0 +1,14 @@
+<Aggregated_Flows>
+  <AggregatedDataFlows>
+    <From>XMLMessagesStorage_storeMessage</From>
+    <To>org_jdom_Element</To>
+    <data_flows>
+      <data_flow_>addContent(name)</data_flow_>
+      <data_flow_>addContent(message)</data_flow_>
+      <data_flow_>addContent(content)</data_flow_>
+      <data_flow_>setText(requestgetParameter(email-us))</data_flow_>
+      <data_flow_>addContent(email)</data_flow_>
+      <data_flow_>addContent(date)</data_flow_>
+    </data_flows>
+  </AggregatedDataFlows>
+</Aggregated_Flows>

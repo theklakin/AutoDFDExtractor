@@ -1,0 +1,36 @@
+The following information is about C:\Users\thekl\Desktop\myBenchmark\src\testcases\test\run\CWE15_External_Control_of_System_or_Configuration_Setting__connect_tcp_04.java
+
+The external entities are: 
+
+testcasesupport
+javax.servlet.http
+java.io.BufferedReader
+java.io.InputStreamReader
+java.io.IOException
+java.net.Socket
+java.util.logging.Level
+java.sql
+
+The fields are: 
+
+There are no fields
+
+The flows are: 
+
+from CWE15_goodG2B1 to database with the name: setCatalog(data);
+from CWE15_goodG2B1 to Logger_log with the name: exceptSql);
+from CWE15_goodG2B1 to Logger_log with the name: exceptSql);
+from CWE15_main to testcasesupport with the name: mainFromParent(args);
+from CWE15_goodG2B2 to database with the name: setCatalog(data);
+from CWE15_goodG2B2 to Logger_log with the name: exceptSql);
+from CWE15_goodG2B2 to Logger_log with the name: exceptSql);
+from java.net.Socket to CWE15_bad with the name: readerInputStream = new InputStreamReader(socket.getInputStream(), "UTF-8");
+from java.io.BufferedReader to CWE15_bad with the name: data = readerBuffered.readLine();
+from CWE15_bad to Logger_log with the name: exceptIO);
+from CWE15_bad to Logger_log with the name: exceptIO);
+from CWE15_bad to Logger_log with the name: exceptIO);
+from CWE15_bad to Logger_log with the name: exceptIO);
+from CWE15_bad to database with the name: setCatalog(data);
+from CWE15_bad to Logger_log with the name: exceptSql);
+from CWE15_bad to Logger_log with the name: exceptSql);
+

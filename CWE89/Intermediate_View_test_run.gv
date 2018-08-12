@@ -1,0 +1,26 @@
+digraph G{
+    CWE89_main -> testcasesupport [label="1"];
+    java_net_Socket -> CWE89_goodB2G [label="1"];
+    CWE89_goodB2G -> testcasesupport [label="2"];
+    CWE89_goodG2B -> database [label="1"];
+    CWE89_bad -> database [label="1"];
+    java_io_BufferedReader -> CWE89_goodB2G [label="1"];
+    java_net_Socket -> CWE89_bad [label="1"];
+    CWE89_bad -> Logger_log [label="2"];
+    CWE89_goodB2G -> database [label="2"];
+    CWE89_bad -> testcasesupport [label="2"];
+    java_io_BufferedReader -> CWE89_bad [label="1"];
+    CWE89_goodG2B -> Logger_log [label="1"];
+    CWE89_goodB2G -> Logger_log [label="2"];
+
+
+    database [shape=diamond];
+    CWE89_bad [shape=ellipse];
+    Logger_log [shape=ellipse];
+    java_net_Socket [shape=box];
+    CWE89_goodB2G [shape=ellipse];
+    CWE89_goodG2B [shape=ellipse];
+    CWE89_main [shape=ellipse];
+    testcasesupport [shape=box];
+    java_io_BufferedReader [shape=box];
+}

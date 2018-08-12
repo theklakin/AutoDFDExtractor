@@ -1,0 +1,15 @@
+digraph G{
+    storage -> javax_servlet_http_HttpServletRequest [label="2"];
+    storage -> java_io_PrintStream [label="1"];
+    storage -> file [label="1"];
+    storage -> org_jdom_Element [label="6"];
+    storage -> org_jdom_input_SAXBuilder [label="1"];
+
+
+    java_io_PrintStream [shape=box];
+    org_jdom_input_SAXBuilder [shape=box];
+    file [shape=diamond];
+    storage [shape=ellipse];
+    org_jdom_Element [shape=box];
+    javax_servlet_http_HttpServletRequest [shape=box];
+}

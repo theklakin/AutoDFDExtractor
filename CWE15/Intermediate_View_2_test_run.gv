@@ -1,0 +1,22 @@
+digraph G{
+    java_net_Socket -> CWE15_bad [label="readerInputStream=newInputStreamReader(socket.getInputStream(),UTF-8)"];
+    CWE15_main -> testcasesupport [label="mainFromParent(args)"];
+    java_io_BufferedReader -> CWE15_bad [label="data=readerBuffered.readLine()"];
+    CWE15_goodG2B1 -> Logger_log [label="exceptSql"];
+    CWE15_bad -> database [label="setCatalog(data)"];
+    CWE15_goodG2B2 -> Logger_log [label="exceptSql"];
+    CWE15_bad -> Logger_log [label="exceptSql|| exceptIO"];
+    CWE15_goodG2B2 -> database [label="setCatalog(data)"];
+    CWE15_goodG2B1 -> database [label="setCatalog(data)"];
+
+
+    database [shape=diamond];
+    Logger_log [shape=ellipse];
+    java_net_Socket [shape=box];
+    CWE15_main [shape=ellipse];
+    CWE15_bad [shape=ellipse];
+    CWE15_goodG2B1 [shape=ellipse];
+    testcasesupport [shape=box];
+    java_io_BufferedReader [shape=box];
+    CWE15_goodG2B2 [shape=ellipse];
+}

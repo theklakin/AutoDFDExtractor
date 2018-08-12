@@ -1,0 +1,22 @@
+digraph G{
+    Results_viewResultsPage -> utils_Utils [label="delete(f3)"];
+    utils_Utils -> Results_viewResultsPage [label="round(tqi,2))</label><br><br><..."];
+    javax_servlet_http_HttpServletRequest -> Results_viewResultsPage [label="FilegitRepo=newFile(request.ge..."];
+    Results_viewResultsPage -> javax_servlet_http_HttpServletResponse [label="setContentType(text/html)"];
+    java_io_BufferedReader -> Results_viewResultsPage [label="StringmalformedJson=br.readLin..."];
+    org_json_JSONObject -> Results_viewResultsPage [label="10"];
+    Results_viewResultsPage -> java_io_PrintStream [label="9"];
+    Results_viewResultsPage -> java_io_PrintWriter [label="println(htmlFile)"];
+    java_lang_String -> Results_viewResultsPage [label="StringprojName=folderName.repl..."];
+
+
+    java_io_PrintWriter [shape=box];
+    org_json_JSONObject [shape=box];
+    java_io_PrintStream [shape=box];
+    java_lang_String [shape=box];
+    Results_viewResultsPage [shape=ellipse];
+    utils_Utils [shape=box];
+    javax_servlet_http_HttpServletRequest [shape=box];
+    java_io_BufferedReader [shape=box];
+    javax_servlet_http_HttpServletResponse [shape=box];
+}

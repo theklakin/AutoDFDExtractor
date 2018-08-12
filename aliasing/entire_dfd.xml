@@ -1,0 +1,27 @@
+<Entire_DFD>
+  <testcases_alias>
+    <External_Entities>
+      <External_Entity>java.io.PrintWriter</External_Entity>
+      <External_Entity>securibench.micro.BasicTestCase</External_Entity>
+      <External_Entity>javax.servlet.http.HttpServletRequest</External_Entity>
+      <External_Entity>javax.servlet.http.HttpServletResponse</External_Entity>
+      <External_Entity>java.io.IOException</External_Entity>
+      <External_Entity>securibench.micro.MicroTestCase</External_Entity>
+    </External_Entities>
+    <Data_Stores>
+      <Data_Store>There are no fields</Data_Store>
+    </Data_Stores>
+    <Data_Flows>
+      <Data_Flow>
+        <From>Aliasing1_doGet</From>
+        <To>java.io.PrintWriter</To>
+        <Name>println(str);</Name>
+      </Data_Flow>
+      <Data_Flow>
+        <From>javax.servlet.http.HttpServletRequest</From>
+        <To>Aliasing1_doGet</To>
+        <Name>String</Name>
+      </Data_Flow>
+    </Data_Flows>
+  </testcases_alias>
+</Entire_DFD>

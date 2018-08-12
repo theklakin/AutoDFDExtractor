@@ -1,0 +1,14 @@
+The following information is about C:\Users\thekl\Desktop\alias\Alias\src\App\Test.java
+
+The external entities are: 
+
+java.io.PrintStream
+
+The fields are: 
+
+There are no fields
+
+The flows are: 
+
+from Test_getDescription to java.io.PrintStream with the name: outprintln(s);
+

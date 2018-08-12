@@ -1,0 +1,9 @@
+digraph G{
+    Aliasing1_doGet -> java_io_PrintWriter [label="1"];
+    javax_servlet_http_HttpServletRequest -> Aliasing1_doGet [label="1"];
+
+
+    java_io_PrintWriter [shape=box];
+    Aliasing1_doGet [shape=ellipse];
+    javax_servlet_http_HttpServletRequest [shape=box];
+}

@@ -1,0 +1,15 @@
+digraph G{
+    Helper -> java_io_PrintStream [label="1"];
+    javax_servlet_http_HttpServletRequest -> App [label="1"];
+    Helper -> App [label="1"];
+    App -> App [label="1"];
+    App -> java_io_PrintWriter [label="1"];
+    App -> java_io_PrintStream [label="1"];
+
+
+    Helper [shape=ellipse];
+    App [shape=ellipse];
+    java_io_PrintWriter [shape=box];
+    java_io_PrintStream [shape=box];
+    javax_servlet_http_HttpServletRequest [shape=box];
+}

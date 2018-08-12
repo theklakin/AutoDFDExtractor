@@ -1,0 +1,25 @@
+<Aggregated_Flows>
+  <AggregatedDataFlows>
+    <From>QualityEvalServlet_doGet</From>
+    <To>java_io_PrintStream</To>
+    <data_flows>
+      <data_flow_>outprintln(Successful!!)</data_flow_>
+      <data_flow_>outprintln(Callingtheappropriatescript!)</data_flow_>
+      <data_flow_>outprintln(Iamivoked!!!)</data_flow_>
+      <data_flow_>outprintln(line)</data_flow_>
+      <data_flow_>outprintln(projName)</data_flow_>
+      <data_flow_>outprintln(egetMessage())</data_flow_>
+      <data_flow_>outprintln(requestgetParameter(project))</data_flow_>
+    </data_flows>
+    <From>QualityEvalServlet_doPost</From>
+    <To>java_io_PrintStream</To>
+    <data_flows>
+      <data_flow_>outprintln(POSTInvoked)</data_flow_>
+      <data_flow_>outprintln(Successful!!)</data_flow_>
+      <data_flow_>outprintln(line)</data_flow_>
+      <data_flow_>outprintln(Unsuccessful!!)</data_flow_>
+      <data_flow_>outprintln(Callingtheappropriatescript!)</data_flow_>
+      <data_flow_>outprintln(Theyarenull!!)</data_flow_>
+    </data_flows>
+  </AggregatedDataFlows>
+</Aggregated_Flows>

@@ -1,0 +1,60 @@
+<Entire_DFD>
+  <Alias_src>
+    <External_Entities>
+      <External_Entity>java.io.PrintWriter</External_Entity>
+      <External_Entity>java.io.PrintStream</External_Entity>
+      <External_Entity>securibench.micro.BasicTestCase</External_Entity>
+      <External_Entity>javax.servlet.http.HttpServletRequest</External_Entity>
+      <External_Entity>javax.servlet.http.HttpServletResponse</External_Entity>
+      <External_Entity>java.io.IOException</External_Entity>
+      <External_Entity>securibench.micro.MicroTestCase</External_Entity>
+    </External_Entities>
+    <Data_Stores>
+      <Data_Store>There are no fields</Data_Store>
+      <Data_Store>There are no fields</Data_Store>
+      <Data_Store>There are no fields</Data_Store>
+    </Data_Stores>
+    <Data_Flows>
+      <Data_Flow>
+        <From>Alias_doGet</From>
+        <To>java.io.PrintWriter</To>
+        <Name>println(str);</Name>
+      </Data_Flow>
+      <Data_Flow>
+        <From>Test_getDescription</From>
+        <To>java.io.PrintStream</To>
+        <Name>outprintln(s);</Name>
+      </Data_Flow>
+      <Data_Flow>
+        <From>AliasHelper_getDescription</From>
+        <To>Alias_doGet</To>
+        <Name>getDescription(str);</Name>
+      </Data_Flow>
+      <Data_Flow>
+        <From>AliasHelper_getDescription</From>
+        <To>java.io.PrintStream</To>
+        <Name>outprintln(s);</Name>
+      </Data_Flow>
+      <Data_Flow>
+        <From>Test_getDescription</From>
+        <To>Alias_doGet</To>
+        <Name>getDescription(str);</Name>
+      </Data_Flow>
+      <Data_Flow>
+        <From />
+        <To />
+        <Name />
+      </Data_Flow>
+      <Data_Flow>
+        <From />
+        <To />
+        <Name />
+      </Data_Flow>
+      <Data_Flow>
+        <From>javax.servlet.http.HttpServletRequest</From>
+        <To>Alias_doGet</To>
+        <Name>String</Name>
+      </Data_Flow>
+    </Data_Flows>
+  </Alias_src>
+</Entire_DFD>

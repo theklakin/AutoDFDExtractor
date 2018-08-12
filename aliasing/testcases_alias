@@ -1,0 +1,18 @@
+The external entities are: 
+
+java.io.PrintWriter
+securibench.micro.BasicTestCase
+javax.servlet.http.HttpServletRequest
+javax.servlet.http.HttpServletResponse
+java.io.IOException
+securibench.micro.MicroTestCase
+
+The fields are: 
+
+There are no fields
+
+The flows are: 
+
+from Aliasing1_doGet to java.io.PrintWriter with the name: println(str);
+from javax.servlet.http.HttpServletRequest to Aliasing1_doGet with the name: String name = req.getParameter(FIELD_NAME);
+

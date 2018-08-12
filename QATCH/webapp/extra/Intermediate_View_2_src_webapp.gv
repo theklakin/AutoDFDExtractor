@@ -1,0 +1,36 @@
+digraph G{
+    QualityEvalServlet_doGet -> javax_servlet_http_HttpServletRequest [label="System.out.println(java-jarqatch.jarrequest.getParameter(project)..."];
+    javax_servlet_http_HttpServletRequest -> QualityEvalServlet_doGet [label="ProcessBuilderbuilder=newProcessBuilder(request.getParameter(project)...)\n|| FilegitRepo=newFile(request.getParameter(project))"];
+    java_io_BufferedReader -> QualityEvalServlet_doGet [label="line=r.readLine()|| StringjsonResults=br.readLine()"];
+    QualityEvalServlet_doPost -> java_lang_ProcessBuilder [label="redirectErrorStream(true)"];
+    QualityEvalServlet_doPost -> storage_XMLMessagesStorage [label="storeMessage(request)"];
+    QualityEvalServlet_doPost -> java_lang_Throwable [label="outprintln(egetMessage())"];
+    QualityEvalServlet_doPost -> interfaces_Results [label="viewResultsPage(response,request)"];
+    QualityEvalServlet_doGet -> java_io_PrintStream [label="7"];
+    QualityEvalServlet_doGet -> java_io_PrintWriter [label="println(errorJson)|| println(jsonResults)"];
+    QualityEvalServlet_doPost -> java_lang_System_getProperty [label="System.out.println(CurrentDir:System.getProperty(user.dir))"];
+    QualityEvalServlet_doPost -> javax_servlet_http_HttpServletRequest [label="System.out.println(request.getParameter(project))..."];
+    javax_servlet_http_HttpServletRequest -> QualityEvalServlet_doPost [label="ProcessBuilderbuilder=newProcessBuilder(request.getParameter(project)...|| RequestDispatcherview=request.getRequestDispatcher(index.html) \n|| RequestDispatcherview=request.getRequestDispatcher(error.html)"];
+    QualityEvalServlet_doGet -> javax_servlet_http_HttpServletResponse [label="setContentType(application/json)"];
+    java_io_BufferedReader -> QualityEvalServlet_doPost [label="line=r.readLine()"];
+    java_lang_String -> QualityEvalServlet_doGet [label="StringprojName=folderName.replace(.git,)"];
+    QualityEvalServlet_doGet -> java_lang_ProcessBuilder [label="redirectErrorStream(true)"];
+    QualityEvalServlet_doPost -> javax_servlet_RequestDispatcher [label="forward(request,response)"];
+    QualityEvalServlet_doPost -> java_io_PrintStream [label="6"];
+
+
+    java_io_PrintWriter [shape=box];
+    java_io_PrintStream [shape=box];
+    javax_servlet_RequestDispatcher [shape=box];
+    javax_servlet_http_HttpServletRequest [shape=box];
+    java_lang_System_getProperty [shape=box];
+    QualityEvalServlet_doGet [shape=ellipse];
+    java_io_BufferedReader [shape=box];
+    interfaces_Results [shape=box];
+    java_lang_ProcessBuilder [shape=box];
+    storage_XMLMessagesStorage [shape=box];
+    java_lang_String [shape=box];
+    java_lang_Throwable [shape=box];
+    QualityEvalServlet_doPost [shape=ellipse];
+    javax_servlet_http_HttpServletResponse [shape=box];
+}

@@ -1,0 +1,9 @@
+digraph G{
+    javax_servlet_http_HttpServletRequest -> Aliasing1_doGet [label="Stringname=req.getParameter(FIELD_NAME)"];
+    Aliasing1_doGet -> java_io_PrintWriter [label="println(str)"];
+
+
+    java_io_PrintWriter [shape=box];
+    Aliasing1_doGet [shape=ellipse];
+    javax_servlet_http_HttpServletRequest [shape=box];
+}

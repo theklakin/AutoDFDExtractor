@@ -1,0 +1,31 @@
+digraph G{
+    CWE89_goodB2G -> testcasesupport [label="writeLine(Name,+data+,updatedsuccessfully)"];
+    CWE89_bad -> testcasesupport [label="writeLine(Name,+data+,updatedsuccessfully)"];
+    java_net_Socket -> CWE89_goodB2G [label="/*readinputfromsocket*/"];
+    CWE89_goodB2G -> Logger_log [label="exceptIO"];
+    java_io_BufferedReader -> CWE89_bad [label="data=readerBuffered.readLine()"];
+    CWE89_goodB2G -> database [label="prepareStatement(insertintousers(status)values('updated')wherename=?)"];
+    CWE89_goodB2G -> database [label="setString(1,data)"];
+    CWE89_goodB2G -> testcasesupport [label="writeLine(Unabletoupdaterecordsforuser:+data)"];
+    CWE89_bad -> database [label="execute(insertintousers(status)values('updated')wherename='+data+')"];
+    java_io_BufferedReader -> CWE89_goodB2G [label="data=readerBuffered.readLine()"];
+    CWE89_bad -> Logger_log [label="exceptIO"];
+    CWE89_bad -> testcasesupport [label="writeLine(Unabletoupdaterecordsforuser:+data)"];
+    CWE89_goodG2B -> database [label="execute(insertintousers(status)values('updated')wherename='+data+')"];
+    CWE89_main -> testcasesupport [label="mainFromParent(args)"];
+    CWE89_goodG2B -> Logger_log [label="exceptSql"];
+    CWE89_goodB2G -> Logger_log [label="exceptSql"];
+    java_net_Socket -> CWE89_bad [label="/*readinputfromsocket*/"];
+    CWE89_bad -> Logger_log [label="exceptSql"];
+
+
+    database [shape=diamond];
+    CWE89_bad [shape=ellipse];
+    Logger_log [shape=ellipse];
+    java_net_Socket [shape=box];
+    CWE89_goodB2G [shape=ellipse];
+    CWE89_goodG2B [shape=ellipse];
+    CWE89_main [shape=ellipse];
+    testcasesupport [shape=box];
+    java_io_BufferedReader [shape=box];
+}

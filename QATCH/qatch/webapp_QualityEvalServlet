@@ -1,0 +1,93 @@
+The following information is about C:\Users\thekl\Desktop\qatch\qatch\src\webapp\QualityEvalServlet.java
+
+The external entities are: 
+
+java.io.BufferedReader
+java.io.File
+java.io.FileNotFoundException
+java.io.FileReader
+java.io.FileWriter
+java.io.IOException
+java.io.InputStreamReader
+java.io.PrintWriter
+java.math.BigDecimal
+java.math.RoundingMode
+java.sql.Connection
+java.sql.DriverManager
+java.sql.SQLException
+java.sql.Statement
+java.util.Date
+javax.servlet.RequestDispatcher
+javax.servlet.ServletException
+javax.servlet.annotation.WebServlet
+javax.servlet.http.HttpServlet
+javax.servlet.http.HttpServletRequest
+javax.servlet.http.HttpServletResponse
+org.apache.commons.io.FileDeleteStrategy
+org.apache.commons.io.FileUtils
+org.jdom.Document
+org.jdom.Element
+org.jdom.JDOMException
+org.jdom.input.SAXBuilder
+org.jdom.output.Format
+org.jdom.output.XMLOutputter
+org.json.JSONArray
+org.json.JSONException
+org.json.JSONObject
+interfaces.Results
+storage.XMLMessagesStorage
+java.lang.Throwable
+java.lang.System.getProperty
+java.lang.ProcessBuilder
+java.lang.String
+java.io.PrintStream
+
+The fields are: 
+
+There are no fields
+
+The flows are: 
+
+from QualityEvalServlet_doPost to java.lang.System.getProperty with the name: System.out.println("Current Dir: " + System.getProperty("user.dir"));
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln("POST Invoked");
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln("Calling the appropriate script!");
+from QualityEvalServlet_doPost to javax.servlet.http.HttpServletRequest with the name: System.out.println("java  -jar " + " qatch.jar " + request.getParameter("project") + " " + request.getParameter("model") + " " + request.getParameter("inspection"));
+from javax.servlet.http.HttpServletRequest to QualityEvalServlet_doPost with the name: ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "java -jar " + " qatch.jar " + request.getParameter("project") + " " + request.getParameter("model") + " no");
+from QualityEvalServlet_doPost to java.lang.ProcessBuilder with the name: redirectErrorStream(true);
+from java.io.BufferedReader to QualityEvalServlet_doPost with the name: line = r.readLine();
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln(line);
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln("Successful!!");
+from QualityEvalServlet_doPost to interfaces.Results with the name: viewResultsPage(response, request);
+from QualityEvalServlet_doPost to java.lang.Throwable with the name: outprintln(egetMessage());
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln("Unsuccessful!!");
+from javax.servlet.http.HttpServletRequest to QualityEvalServlet_doPost with the name: RequestDispatcher view = request.getRequestDispatcher("error.html");
+from QualityEvalServlet_doPost to javax.servlet.RequestDispatcher with the name: forward(request, response);
+from QualityEvalServlet_doPost to java.lang.Throwable with the name: outprintln(egetMessage());
+from QualityEvalServlet_doPost to java.lang.Throwable with the name: outprintln(egetMessage());
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln("They are null!!");
+from QualityEvalServlet_doPost to storage.XMLMessagesStorage with the name: storeMessage(request);
+from javax.servlet.http.HttpServletRequest to QualityEvalServlet_doPost with the name: RequestDispatcher view = request.getRequestDispatcher("index.html");
+from QualityEvalServlet_doPost to javax.servlet.RequestDispatcher with the name: forward(request, response);
+from QualityEvalServlet_doPost to java.lang.Throwable with the name: outprintln(egetMessage());
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln("I am ivoked!!!");
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln(requestgetParameter("project"));
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln("Calling the appropriate script!");
+from QualityEvalServlet_doGet to javax.servlet.http.HttpServletRequest with the name: System.out.println("java  -jar " + " qatch.jar " + request.getParameter("project") + " " + request.getParameter("model") + " " + request.getParameter("inspection"));
+from javax.servlet.http.HttpServletRequest to QualityEvalServlet_doGet with the name: ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "java -jar " + " qatch.jar " + request.getParameter("project") + " " + request.getParameter("model") + " " + request.getParameter("inspection"));
+from QualityEvalServlet_doGet to java.lang.ProcessBuilder with the name: redirectErrorStream(true);
+from java.io.BufferedReader to QualityEvalServlet_doGet with the name: line = r.readLine();
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln(line);
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln("Successful!!");
+from javax.servlet.http.HttpServletRequest to QualityEvalServlet_doGet with the name: File gitRepo = new File(request.getParameter("project"));
+from java.lang.String to QualityEvalServlet_doGet with the name: String projName = folderName.replace(".git", "");
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln(projName);
+from java.io.BufferedReader to QualityEvalServlet_doGet with the name: String jsonResults = br.readLine();
+from QualityEvalServlet_doGet to javax.servlet.http.HttpServletResponse with the name: setContentType("application/json");
+from QualityEvalServlet_doGet to java.io.PrintWriter with the name: println(jsonResults);
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln(egetMessage());
+from QualityEvalServlet_doGet to javax.servlet.http.HttpServletResponse with the name: setContentType("application/json");
+from QualityEvalServlet_doGet to java.io.PrintWriter with the name: println(errorJson);
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln(egetMessage());
+from QualityEvalServlet_doGet to javax.servlet.http.HttpServletResponse with the name: setContentType("application/json");
+from QualityEvalServlet_doGet to java.io.PrintWriter with the name: println(errorJson);
+

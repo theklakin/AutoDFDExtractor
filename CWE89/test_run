@@ -1,0 +1,36 @@
+The external entities are: 
+
+java.net.Socket
+javax.servlet.http
+java.io.IOException
+java.io.BufferedReader
+java.io.InputStreamReader
+testcasesupport
+java.util.logging.Level
+
+The fields are: 
+
+There are no fields
+
+The flows are: 
+
+from CWE89_goodB2G to testcasesupport with the name: writeLine("Name, " + data + ", updated successfully");
+readerInputStream = new InputStreamReader(socket.getInputStream(), "UTF-8");
+from CWE89_bad to testcasesupport with the name: writeLine("Name, " + data + ", updated successfully");
+from java.net.Socket to CWE89_goodB2G with the name: /* read input from socket */
+from CWE89_goodB2G to Logger_log with the name: exceptIO);
+from java.io.BufferedReader to CWE89_bad with the name: data = readerBuffered.readLine();
+from CWE89_goodB2G to database with the name: prepareStatement("insert into users (status) values ('updated') where name=?");
+from CWE89_goodB2G to database with the name: setString(1, data);
+from CWE89_goodB2G to testcasesupport with the name: writeLine("Unable to update records for user: " + data);
+from CWE89_bad to database with the name: execute("insert into users (status) values ('updated') where name='" + data + "'");
+from java.io.BufferedReader to CWE89_goodB2G with the name: data = readerBuffered.readLine();
+from CWE89_bad to Logger_log with the name: exceptIO);
+from CWE89_bad to testcasesupport with the name: writeLine("Unable to update records for user: " + data);
+from CWE89_goodG2B to database with the name: execute("insert into users (status) values ('updated') where name='" + data + "'");
+from CWE89_main to testcasesupport with the name: mainFromParent(args);
+from CWE89_goodG2B to Logger_log with the name: exceptSql);
+from CWE89_goodB2G to Logger_log with the name: exceptSql);
+from java.net.Socket to CWE89_bad with the name: /* read input from socket */
+from CWE89_bad to Logger_log with the name: exceptSql);
+

@@ -1,0 +1,6 @@
+java.io.FileOutputStream
+java.io.OutputStreamWriter
+java.io.File
+java.io.FileWriter
+java.sql
+org.jdom.output.XMLOutputter

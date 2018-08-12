@@ -1,0 +1,23 @@
+digraph G{
+    testcases.CWE89_SQL_Injection.s01 -> testcasesupport [label="1"];
+    java_net_Socket -> testcases.CWE89_SQL_Injection.s01 [label="1"];
+    testcases.CWE89_SQL_Injection.s01 -> testcasesupport [label="2"];
+    testcases.CWE89_SQL_Injection.s01 -> database [label="1"];
+    testcases.CWE89_SQL_Injection.s01 -> database [label="1"];
+    java_io_BufferedReader -> testcases.CWE89_SQL_Injection.s01 [label="1"];
+    java_net_Socket -> testcases.CWE89_SQL_Injection.s01 [label="1"];
+    testcases.CWE89_SQL_Injection.s01 -> Logger_log [label="2"];
+    testcases.CWE89_SQL_Injection.s01 -> database [label="2"];
+    testcases.CWE89_SQL_Injection.s01 -> testcasesupport [label="2"];
+    java_io_BufferedReader -> testcases.CWE89_SQL_Injection.s01 [label="1"];
+    testcases.CWE89_SQL_Injection.s01 -> Logger_log [label="1"];
+    testcases.CWE89_SQL_Injection.s01 -> Logger_log [label="2"];
+
+
+    database [shape=diamond];
+    Logger_log [shape=ellipse];
+    java_net_Socket [shape=box];
+    testcases.CWE89_SQL_Injection.s01 [shape=ellipse];
+    testcasesupport [shape=box];
+    java_io_BufferedReader [shape=box];
+}

@@ -1,0 +1,18 @@
+The following information is about C:\Users\thekl\Desktop\qatch\qatch\src\utils\Utils.java
+
+The external entities are: 
+
+java.io.File
+java.io.IOException
+java.math.BigDecimal
+java.math.RoundingMode
+
+The fields are: 
+
+There are no fields
+
+The flows are: 
+
+from java.math.BigDecimal to Utils_round with the name: setScale(places, RoundingModeHALF_UP);
+from Utils_delete to Utils_delete with the name: delete(fileDelete);
+

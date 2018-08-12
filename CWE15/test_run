@@ -1,0 +1,27 @@
+The external entities are: 
+
+java.net.Socket
+javax.servlet.http
+java.io.IOException
+java.io.BufferedReader
+java.io.InputStreamReader
+testcasesupport
+java.util.logging.Level
+
+The fields are: 
+
+There are no fields
+
+The flows are: 
+
+from java.net.Socket to CWE15_bad with the name: readerInputStream = new InputStreamReader(socket.getInputStream(), "UTF-8");
+from CWE15_bad to Logger_log with the name: exceptIO);
+from CWE15_goodG2B1 to database with the name: setCatalog(data);
+from CWE15_main to testcasesupport with the name: mainFromParent(args);
+from CWE15_goodG2B2 to Logger_log with the name: exceptSql);
+from CWE15_bad to Logger_log with the name: exceptSql);
+from CWE15_goodG2B1 to Logger_log with the name: exceptSql);
+from CWE15_goodG2B2 to database with the name: setCatalog(data);
+from java.io.BufferedReader to CWE15_bad with the name: data = readerBuffered.readLine();
+from CWE15_bad to database with the name: setCatalog(data);
+

@@ -1,0 +1,15 @@
+digraph G{
+    XMLMessagesStorage_storeMessage -> java_io_PrintStream [label="outprintln(egetMessage())"];
+    XMLMessagesStorage_storeMessage -> org_jdom_input_SAXBuilder [label="build(newFile(/messagesxml))"];
+    XMLMessagesStorage_storeMessage -> file [label="output(root,filew)"];
+    XMLMessagesStorage_storeMessage -> javax_servlet_http_HttpServletRequest [label="content.setText(request.getParameter(message))|| name.setText(request.getParameter(name))"];
+    XMLMessagesStorage_storeMessage -> org_jdom_Element [label="6"];
+
+
+    org_jdom_input_SAXBuilder [shape=box];
+    java_io_PrintStream [shape=box];
+    file [shape=diamond];
+    XMLMessagesStorage_storeMessage [shape=ellipse];
+    org_jdom_Element [shape=box];
+    javax_servlet_http_HttpServletRequest [shape=box];
+}

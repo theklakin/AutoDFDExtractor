@@ -1,0 +1,9 @@
+digraph G{
+    securibench.micro.aliasing -> java_io_PrintWriter [label="1"];
+    javax_servlet_http_HttpServletRequest -> securibench.micro.aliasing [label="1"];
+
+
+    java_io_PrintWriter [shape=box];
+    securibench.micro.aliasing [shape=ellipse];
+    javax_servlet_http_HttpServletRequest [shape=box];
+}

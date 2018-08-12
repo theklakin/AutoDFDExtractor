@@ -1,0 +1,19 @@
+digraph G{
+    testcases.CWE15_External_Control_of_System_or_Configuration_Setting -> testcasesupport [label="1"];
+    testcases.CWE15_External_Control_of_System_or_Configuration_Setting -> database [label="1"];
+    testcases.CWE15_External_Control_of_System_or_Configuration_Setting -> database [label="1"];
+    java_net_Socket -> testcases.CWE15_External_Control_of_System_or_Configuration_Setting [label="1"];
+    testcases.CWE15_External_Control_of_System_or_Configuration_Setting -> Logger_log [label="2"];
+    testcases.CWE15_External_Control_of_System_or_Configuration_Setting -> Logger_log [label="1"];
+    java_io_BufferedReader -> testcases.CWE15_External_Control_of_System_or_Configuration_Setting [label="1"];
+    testcases.CWE15_External_Control_of_System_or_Configuration_Setting -> Logger_log [label="1"];
+    testcases.CWE15_External_Control_of_System_or_Configuration_Setting -> database [label="1"];
+
+
+    database [shape=diamond];
+    Logger_log [shape=ellipse];
+    java_net_Socket [shape=box];
+    testcases.CWE15_External_Control_of_System_or_Configuration_Setting [shape=ellipse];
+    testcasesupport [shape=box];
+    java_io_BufferedReader [shape=box];
+}

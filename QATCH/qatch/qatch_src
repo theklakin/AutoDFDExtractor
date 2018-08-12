@@ -1,0 +1,124 @@
+The external entities are: 
+
+java.lang.Throwable
+org.jdom.input.SAXBuilder
+javax.servlet.ServletException
+java.util.Date
+org.apache.commons.io.FileDeleteStrategy
+org.jdom.output.Format
+org.jdom.output.XMLOutputter
+java.math.BigDecimal
+javax.servlet.http.HttpServletRequest
+org.json.JSONException
+org.jdom.Document
+org.json.JSONObject
+org.jdom.JDOMException
+java.lang.System.getProperty
+java.lang.String
+java.lang.ProcessBuilder
+java.math.RoundingMode
+java.io.PrintWriter
+java.io.PrintStream
+javax.servlet.http.HttpServlet
+javax.servlet.RequestDispatcher
+javax.servlet.http.HttpServletResponse
+java.io.FileWriter
+java.io.IOException
+org.apache.commons.io.FileUtils
+java.io.InputStreamReader
+java.io.File
+java.io.FileNotFoundException
+javax.servlet.annotation.WebServlet
+java.io.BufferedReader
+java.io.FileReader
+org.jdom.Element
+org.json.JSONArray
+
+The fields are: 
+
+There are no fields
+to file with type: file
+There are no fields
+There are no fields
+
+The flows are: 
+
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln(requestgetParameter("project"));
+from java.io.BufferedReader to QualityEvalServlet_doGet with the name: String jsonResults = br.readLine();
+ from Results_viewResultsPage to Utils_delete with the name: delete(f3);
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln("\n\n\n\n**********************   TEST   *****************************");
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln("Calling the appropriate script!");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject(i)getString("name");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject(i)getString("standard");
+from Results_viewResultsPage to java.io.PrintWriter with the name: println(htmlFile);
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject("characteristics");
+from XMLMessagesStorage_storeMessage to java.io.PrintStream with the name: outprintln(egetMessage());
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln(htmlFile);
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: addContent(name);
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln("Unsuccessful!!");
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: addContent(date);
+from java.lang.String to Results_viewResultsPage with the name: String projName = folderName.replace(".git", "");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject(i)getDouble("eval");
+from QualityEvalServlet_doPost to javax.servlet.RequestDispatcher with the name: forward(request, response);
+from QualityEvalServlet_doPost to javax.servlet.http.HttpServletRequest with the name: System.out.println("java  -jar " + " qatch.jar " + request.getParameter("project") + " " + request.getParameter("model") + " " + request.getParameter("inspection"));
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject("tqi");
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln("NAME : eval_" + projFullName + "json");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject("properties");
+from Results_viewResultsPage to javax.servlet.http.HttpServletResponse with the name: setContentType("text/html");
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: setText(requestgetParameter("email-us"));
+from java.lang.String to QualityEvalServlet_doGet with the name: String projName = folderName.replace(".git", "");
+from QualityEvalServlet_doGet to java.io.PrintWriter with the name: println(errorJson);
+from javax.servlet.http.HttpServletRequest to QualityEvalServlet_doPost with the name: RequestDispatcher view = request.getRequestDispatcher("error.html");
+from XMLMessagesStorage_storeMessage to javax.servlet.http.HttpServletRequest with the name: content.setText(request.getParameter("message"));
+from XMLMessagesStorage_storeMessage to file with the name: output(root, filew);
+from QualityEvalServlet_doGet to javax.servlet.http.HttpServletRequest with the name: System.out.println("java  -jar " + " qatch.jar " + request.getParameter("project") + " " + request.getParameter("model") + " " + request.getParameter("inspection"));
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln(name + " value = " + eval);
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln("Successful!!");
+ The following information is about C:\Users\thekl\Desktop\qatch\qatch\src\webapp\QualityEvalServlet.java
+from QualityEvalServlet_doGet to javax.servlet.http.HttpServletResponse with the name: setContentType("application/json");
+from java.math.BigDecimal to Utils_round with the name: setScale(places, RoundingModeHALF_UP);
+from javax.servlet.http.HttpServletRequest to QualityEvalServlet_doGet with the name: File gitRepo = new File(request.getParameter("project"));
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln(malformedJson);
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln("POST Invoked");
+from QualityEvalServlet_doPost to java.lang.System.getProperty with the name: System.out.println("Current Dir: " + System.getProperty("user.dir"));
+from org.json.JSONObject to Results_viewResultsPage with the name: getDouble("eval");
+ from Utils_round to Results_viewResultsPage with the name: round(eval, 2) + "</td>" + "</tr>";
+ from QualityEvalServlet_doPost to Results_viewResultsPage with the name: viewResultsPage(response, request);
+from XMLMessagesStorage_storeMessage to javax.servlet.http.HttpServletRequest with the name: name.setText(request.getParameter("name"));
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln(egetMessage());
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln("They are null!!");
+from QualityEvalServlet_doGet to java.lang.ProcessBuilder with the name: redirectErrorStream(true);
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln("Calling the appropriate script!");
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln(projName);
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONArray("characteristics");
+from Utils_delete to Utils_delete with the name: delete(fileDelete);
+from java.io.BufferedReader to QualityEvalServlet_doPost with the name: line = r.readLine();
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln(line);
+from QualityEvalServlet_doGet to java.io.PrintWriter with the name: println(jsonResults);
+from XMLMessagesStorage_storeMessage to org.jdom.input.SAXBuilder with the name: build(new File("/messagesxml"));
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln("I am ivoked!!!");
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln("DELETING");
+from QualityEvalServlet_doPost to java.io.PrintStream with the name: outprintln(line);
+from QualityEvalServlet_doPost to java.lang.ProcessBuilder with the name: redirectErrorStream(true);
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: addContent(message);
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln(projName);
+ from QualityEvalServlet_doPost to XMLMessagesStorage_storeMessage with the name: storeMessage(request);
+from QualityEvalServlet_doGet to java.io.PrintStream with the name: outprintln("Successful!!");
+from java.io.BufferedReader to Results_viewResultsPage with the name: String malformedJson = br.readLine();
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln(name + " normValue= " + normValue + " eval= " + eval);
+ from Utils_round to Results_viewResultsPage with the name: round(normValue, 10) + "</td>" + "<td>" + Utilsround(eval, 2) + "</td>" + "</tr>";
+from javax.servlet.http.HttpServletRequest to Results_viewResultsPage with the name: File gitRepo = new File(request.getParameter("project"));
+from javax.servlet.http.HttpServletRequest to QualityEvalServlet_doPost with the name: RequestDispatcher view = request.getRequestDispatcher("index.html");
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: addContent(email);
+ The following information is about C:\Users\thekl\Desktop\qatch\qatch\src\utils\Utils.java
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: addContent(content);
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONArray("properties");
+from QualityEvalServlet_doPost to java.lang.Throwable with the name: outprintln(egetMessage());
+ from Utils_round to Results_viewResultsPage with the name: round(tqi, 2) + ")</label>" + "<br><br><br>";
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln("TQI = " + tqi);
+ The following information is about C:\Users\thekl\Desktop\qatch\qatch\src\storage\XMLMessagesStorage.java
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject(i)getJSONObject("measure")getDouble("normValue");
+from javax.servlet.http.HttpServletRequest to QualityEvalServlet_doPost with the name: ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "java -jar " + " qatch.jar " + request.getParameter("project") + " " + request.getParameter("model") + " no");
+from java.io.BufferedReader to QualityEvalServlet_doGet with the name: line = r.readLine();
+from javax.servlet.http.HttpServletRequest to QualityEvalServlet_doGet with the name: ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "java -jar " + " qatch.jar " + request.getParameter("project") + " " + request.getParameter("model") + " " + request.getParameter("inspection"));
+

@@ -1,0 +1,57 @@
+digraph G{
+    java_math_BigDecimal -> utils [label="1"];
+    webapp -> java_lang_Throwable [label="1"];
+    webapp -> storage [label="1"];
+    storage -> java_io_PrintStream [label="1"];
+    storage -> org_jdom_Element [label="6"];
+    utils -> interfaces [label="3"];
+    webapp -> javax_servlet_http_HttpServletRequest [label="1"];
+    java_lang_String -> interfaces [label="1"];
+    java_lang_String -> webapp [label="1"];
+    webapp -> java_io_PrintStream [label="7"];
+    javax_servlet_http_HttpServletRequest -> webapp [label="2"];
+    storage -> org_jdom_input_SAXBuilder [label="1"];
+    interfaces -> java_io_PrintWriter [label="1"];
+    java_io_BufferedReader -> webapp [label="2"];
+    java_io_BufferedReader -> interfaces [label="1"];
+    storage -> javax_servlet_http_HttpServletRequest [label="2"];
+    interfaces -> javax_servlet_http_HttpServletResponse [label="1"];
+    webapp -> java_lang_System_getProperty [label="1"];
+    webapp -> java_lang_ProcessBuilder [label="1"];
+    interfaces -> utils [label="1"];
+    webapp -> java_io_PrintWriter [label="2"];
+    storage -> file [label="1"];
+    webapp -> javax_servlet_http_HttpServletResponse [label="1"];
+    java_io_BufferedReader -> webapp [label="1"];
+    webapp -> interfaces [label="1"];
+    webapp -> java_lang_ProcessBuilder [label="1"];
+    interfaces -> java_io_PrintStream [label="9"];
+    javax_servlet_http_HttpServletRequest -> webapp [label="3"];
+    webapp -> java_io_PrintStream [label="6"];
+    webapp -> javax_servlet_RequestDispatcher [label="1"];
+    org_json_JSONObject -> interfaces [label="10"];
+    javax_servlet_http_HttpServletRequest -> interfaces [label="1"];
+    utils -> utils [label="1"];
+    webapp -> javax_servlet_http_HttpServletRequest [label="1"];
+
+
+    java_math_BigDecimal [shape=box];
+    webapp [shape=ellipse];
+    java_io_PrintWriter [shape=box];
+    java_io_PrintStream [shape=box];
+    org_json_JSONObject [shape=box];
+    interfaces [shape=ellipse];
+    javax_servlet_RequestDispatcher [shape=box];
+    storage [shape=ellipse];
+    org_jdom_Element [shape=box];
+    javax_servlet_http_HttpServletRequest [shape=box];
+    java_lang_System_getProperty [shape=box];
+    java_io_BufferedReader [shape=box];
+    org_jdom_input_SAXBuilder [shape=box];
+    file [shape=diamond];
+    java_lang_ProcessBuilder [shape=box];
+    java_lang_String [shape=box];
+    utils [shape=ellipse];
+    java_lang_Throwable [shape=box];
+    javax_servlet_http_HttpServletResponse [shape=box];
+}

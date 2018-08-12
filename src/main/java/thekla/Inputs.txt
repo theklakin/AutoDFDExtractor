@@ -1,0 +1,12 @@
+java.io.BufferedReader
+java.io.InputStreamReader
+java.io.InputStream
+java.io.FileReader
+java.net.Socket
+java.io.FileInputStream
+java.util.Scanner
+javax.servlet.http.HttpServletRequest
+javax.servlet.ServletRequest
+javax.servlet.http.Cookie
+java.lang.String
+java.lang.System.getProperty

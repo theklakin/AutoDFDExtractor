@@ -1,0 +1,16 @@
+digraph G{
+    AliasHelper_getDescription -> Alias_doGet [label="getDescription(str)"];
+    AliasHelper_getDescription -> java_io_PrintStream [label="outprintln(s)"];
+    Alias_doGet -> java_io_PrintWriter [label="println(str)"];
+    Test_getDescription -> Alias_doGet [label="getDescription(str)"];
+    Test_getDescription -> java_io_PrintStream [label="outprintln(s)"];
+    javax_servlet_http_HttpServletRequest -> Alias_doGet [label="Stringname=req.getParameter(FIELD_NAME)"];
+
+
+    java_io_PrintWriter [shape=box];
+    java_io_PrintStream [shape=box];
+    Alias_doGet [shape=ellipse];
+    AliasHelper_getDescription [shape=ellipse];
+    Test_getDescription [shape=ellipse];
+    javax_servlet_http_HttpServletRequest [shape=box];
+}

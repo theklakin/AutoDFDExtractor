@@ -1,0 +1,36 @@
+The following information is about C:\Users\thekl\Desktop\qatch\qatch\src\storage\XMLMessagesStorage.java
+
+The external entities are: 
+
+java.io.File
+java.io.FileWriter
+java.io.IOException
+java.util.Date
+javax.servlet.http.HttpServletRequest
+org.jdom.Document
+org.jdom.Element
+org.jdom.JDOMException
+org.jdom.input.SAXBuilder
+org.jdom.output.Format
+org.jdom.output.XMLOutputter
+java.io.PrintStream
+
+The fields are: 
+
+to file with type: file
+
+The flows are: 
+
+from XMLMessagesStorage_storeMessage to org.jdom.input.SAXBuilder with the name: build(new File("/messagesxml"));
+from XMLMessagesStorage_storeMessage to java.io.PrintStream with the name: outprintln(egetMessage());
+from XMLMessagesStorage_storeMessage to javax.servlet.http.HttpServletRequest with the name: name.setText(request.getParameter("name"));
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: setText(requestgetParameter("email-us"));
+from XMLMessagesStorage_storeMessage to javax.servlet.http.HttpServletRequest with the name: content.setText(request.getParameter("message"));
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: addContent(name);
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: addContent(email);
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: addContent(date);
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: addContent(content);
+from XMLMessagesStorage_storeMessage to org.jdom.Element with the name: addContent(message);
+from XMLMessagesStorage_storeMessage to file with the name: output(root, filew);
+from XMLMessagesStorage_storeMessage to java.io.PrintStream with the name: outprintln(egetMessage());
+

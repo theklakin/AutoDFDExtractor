@@ -1,0 +1,21 @@
+digraph G{
+    XMLMessagesStorage_storeMessage -> javax_servlet_http_HttpServletRequest [label="name.setText(request.getParameter(name))"];
+    XMLMessagesStorage_storeMessage -> org_jdom_Element [label="addContent(date)"];
+    XMLMessagesStorage_storeMessage -> org_jdom_input_SAXBuilder [label="build(newFile(/messagesxml))"];
+    XMLMessagesStorage_storeMessage -> org_jdom_Element [label="addContent(email)"];
+    XMLMessagesStorage_storeMessage -> org_jdom_Element [label="setText(requestgetParameter(email-us))"];
+    XMLMessagesStorage_storeMessage -> org_jdom_Element [label="addContent(content)"];
+    XMLMessagesStorage_storeMessage -> org_jdom_Element [label="addContent(message)"];
+    XMLMessagesStorage_storeMessage -> java_io_PrintStream [label="outprintln(egetMessage())"];
+    XMLMessagesStorage_storeMessage -> javax_servlet_http_HttpServletRequest [label="content.setText(request.getParameter(message))"];
+    XMLMessagesStorage_storeMessage -> file [label="output(root,filew)"];
+    XMLMessagesStorage_storeMessage -> org_jdom_Element [label="addContent(name)"];
+
+
+    org_jdom_input_SAXBuilder [shape=box];
+    java_io_PrintStream [shape=box];
+    file [shape=diamond];
+    XMLMessagesStorage_storeMessage [shape=ellipse];
+    org_jdom_Element [shape=box];
+    javax_servlet_http_HttpServletRequest [shape=box];
+}

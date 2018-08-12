@@ -1,0 +1,13 @@
+java.io.FileOutputStream
+java.io.OutputStreamWriter
+java.io.File
+java.io.FileWriter
+java.sql
+java.util.logging.Level
+javax.servlet.http.HttpServletResponse
+javax.servlet.ServletResponse
+java.io.PrintWriter
+java.io.PrintStream
+java.lang.Throwable
+java.lang.ProcessBuilder
+java.lang.System.setProperty

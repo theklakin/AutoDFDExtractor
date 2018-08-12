@@ -1,0 +1,23 @@
+The following information is about C:\Users\thekl\Desktop\alias\Alias\src\App\Alias.java
+
+The external entities are: 
+
+java.io.IOException
+java.io.PrintWriter
+javax.servlet.http.HttpServletRequest
+javax.servlet.http.HttpServletResponse
+securibench.micro.BasicTestCase
+securibench.micro.MicroTestCase
+Helper.AliasHelper
+
+The fields are: 
+
+There are no fields
+
+The flows are: 
+
+from javax.servlet.http.HttpServletRequest to Alias_doGet with the name: String name = req.getParameter(FIELD_NAME);
+from Test_getDescription to Alias_doGet with the name: getDescription(str);
+from Helper.AliasHelper to Alias_doGet with the name: getDescription(str);
+from Alias_doGet to java.io.PrintWriter with the name: println(str);
+

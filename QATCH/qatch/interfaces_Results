@@ -1,0 +1,55 @@
+The following information is about C:\Users\thekl\Desktop\qatch\qatch\src\interfaces\Results.java
+
+The external entities are: 
+
+java.io.BufferedReader
+java.io.File
+java.io.FileReader
+java.io.IOException
+java.io.PrintWriter
+javax.servlet.http.HttpServletRequest
+javax.servlet.http.HttpServletResponse
+org.json.JSONArray
+org.json.JSONException
+org.json.JSONObject
+utils.Utils
+java.io.PrintStream
+java.lang.String
+
+The fields are: 
+
+There are no fields
+
+The flows are: 
+
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln("\n\n\n\n**********************   TEST   *****************************");
+from javax.servlet.http.HttpServletRequest to Results_viewResultsPage with the name: File gitRepo = new File(request.getParameter("project"));
+from java.lang.String to Results_viewResultsPage with the name: String projName = folderName.replace(".git", "");
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln(projName);
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln("NAME : eval_" + projFullName + "json");
+from java.io.BufferedReader to Results_viewResultsPage with the name: String malformedJson = br.readLine();
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln(malformedJson);
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject("tqi");
+from org.json.JSONObject to Results_viewResultsPage with the name: getDouble("eval");
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln("TQI = " + tqi);
+from utils.Utils to Results_viewResultsPage with the name: round(tqi, 2) + ")</label>" + "<br><br><br>";
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject("characteristics");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONArray("characteristics");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject(i)getString("name");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject(i)getString("standard");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject(i)getDouble("eval");
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln(name + " value = " + eval);
+from utils.Utils to Results_viewResultsPage with the name: round(eval, 2) + "</td>" + "</tr>";
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject("properties");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONArray("properties");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject(i)getString("name");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject(i)getDouble("eval");
+from org.json.JSONObject to Results_viewResultsPage with the name: getJSONObject(i)getJSONObject("measure")getDouble("normValue");
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln(name + " normValue= " + normValue + " eval= " + eval);
+from utils.Utils to Results_viewResultsPage with the name: round(normValue, 10) + "</td>" + "<td>" + Utilsround(eval, 2) + "</td>" + "</tr>";
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln(htmlFile);
+from Results_viewResultsPage to javax.servlet.http.HttpServletResponse with the name: setContentType("text/html");
+from Results_viewResultsPage to java.io.PrintWriter with the name: println(htmlFile);
+from Results_viewResultsPage to java.io.PrintStream with the name: outprintln("DELETING");
+from Results_viewResultsPage to utils.Utils with the name: delete(f3);
+
