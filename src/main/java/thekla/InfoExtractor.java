@@ -1,9 +1,5 @@
 package thekla;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +31,7 @@ public class InfoExtractor {
 	private List<InfoContainer> allDFDInfo;
 	private String className;
 	private Integer index;
+	private List<String> methodNamesA;
 	
 	InfoExtractor(){
 		System.out.println("InfoExtracor created");
@@ -44,6 +41,7 @@ public class InfoExtractor {
 		index = 0;
 		this.className = className;
 		allDFDInfo = new ArrayList<>();
+		methodNamesA = new ArrayList<>();
 	}
 	
 	public Optional<PackageDeclaration> getPackage(){
@@ -62,6 +60,11 @@ public class InfoExtractor {
 		VoidVisitor<HashMap<SimpleName, List<Parameter>>> methodNameCollector = new MethodNameCollector();
 		methodNameCollector.visit(cu, methodNames);
 		allMethodNames.putAll(methodNames);
+		
+		/*for(Entry<SimpleName,List<Parameter>> k : allMethodNames.entrySet()) {
+			System.out.println(k.getKey());
+			methodNamesA.add(k.getKey().asString());
+		}*/
 		
 		//this will find all the persistent storages
 		HashMap<FieldDeclaration, String> fields = new HashMap<>();
@@ -133,6 +136,7 @@ public class InfoExtractor {
 	private void inform(List<ImportDeclaration> libraries, HashMap<String, String> fields, HashMap<SimpleName,List<Parameter>> allMethodNames,  HashMap<SimpleName, List<Statement>> methodStmnt, HashMap<SimpleName,HashMap<Statement,String>> orderedMethodCalls){
 		for(Entry<SimpleName,List<Parameter>> entry : allMethodNames.entrySet()) {
 			SimpleName name = entry.getKey();
+			methodNamesA.add(className + "_" + name.asString());
 			InfoContainer dfd = new InfoContainer();
 			dfd.setMethodName(entry.getKey().asString());
 			dfd.setParameters(entry.getValue());
@@ -253,6 +257,10 @@ public class InfoExtractor {
 		return ordered;
 	}
 	
+	public List<String> getMethodNames() {
+		return methodNamesA;
+	}
+
 	private static class MethodNameCollector extends VoidVisitorAdapter<HashMap<SimpleName,List<Parameter>>> {
 		
 		public void visit(MethodDeclaration md, HashMap<SimpleName,List<Parameter>> collector) {

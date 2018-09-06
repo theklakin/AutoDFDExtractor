@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry including="**/*.java" kind="src" output="target/test-classes" path="src/test/java"/>
-	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/classes" path="src/main/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/github/javaparser/javaparser-core/3.5.14/javaparser-core-3.5.14.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/sssss/animal-sniffer-annotations-1.14.jar"/>
@@ -27,5 +36,11 @@
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/jdom-2.0.6.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/helper_java/java-json.jar"/>
 	<classpathentry kind="lib" path="C:/Users/thekl/Desktop/xvxbfh/qatchLibs/json-20180130.jar"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

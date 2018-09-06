@@ -64,14 +64,14 @@ public class App
         List<String> outputLibs = inOut.getOutputLibs();
         List<String> dsLibs = inOut.getDSLibs();
         
-        HashMap<Entry<String,String>, Entry<String, String>> methodCallTrace = new HashMap<>();
+        HashMap<Entry<String,String>, Entry<String, Integer>> methodCallTrace = new HashMap<>();
         HashMap<String,HashMap<String,String>> alias = new HashMap<>();
         List<Optional<PackageDeclaration>> packages = new ArrayList<>();
         List<String> subFiles = new ArrayList<>();
         HashMap<Integer, Entry<String,String>> subDFD = new HashMap<>();
         int i = 0;
         long intermediateTime = 0;
-        
+        List<String> methodNames = new ArrayList<>();
 		try {
 			for(String s : files) {
 				String fileName = output.createOutputFile(s);
@@ -106,9 +106,10 @@ public class App
 		        List<InfoContainer> allDFDInfo = new ArrayList<>();
 		        allDFDInfo = info.getDFDs();	
 		        packages.add(info.getPackage());
+		        methodNames.addAll(info.getMethodNames());
 				
 		        //now i need to get flows
-				DataFlowExtractor dataFlow = new DataFlowExtractor(allDFDInfo,className, inputLibs, outputLibs, dsLibs);
+				DataFlowExtractor dataFlow = new DataFlowExtractor(allDFDInfo,className, inputLibs, outputLibs, dsLibs, methodNames);
 				HashMap<Integer, String> flowsFrom = new HashMap<>();
 				HashMap<Integer, String> flowsTo = new HashMap<>();
 				HashMap<Integer, String> flowsName = new HashMap<>();
@@ -125,11 +126,11 @@ public class App
 				
 				HashMap<String,String> dataStores = dataFlow.getDataStores();
 				Optional<PackageDeclaration> pack = info.getPackage();
-				methodCallTrace = dataFlow.getTrace();
+				methodCallTrace.putAll(dataFlow.getTrace());
 				
-				/*for(Entry<Entry<String,String>,Entry<String,String>> entry : methodCallTrace.entrySet()) {
+				/*for(Entry<Entry<String,String>,Entry<String,Integer>> entry : methodCallTrace.entrySet()) {
 					Entry<String,String> meth = entry.getKey();
-					Entry<String,String> al = entry.getValue();
+					Entry<String,Integer> al = entry.getValue();
 					System.out.println("Method " + meth.getKey() + " calls method " + meth.getValue());
 					System.out.println("with parameter " + al.getKey() + " aliasing " + al.getValue());
 				}*/
@@ -178,7 +179,7 @@ public class App
 		System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
 		String variable = scanner.next();
 		while(!variable.equals("No")) {		
-				SpecificDFD specDFD = new SpecificDFD(DFDfileName, variable, methodCallTrace, alias, threshold);
+				SpecificDFD specDFD = new SpecificDFD(DFDfileName, variable, methodCallTrace, alias, threshold, methodNames);
 				specDFD.creteSpecificDFD();
 				System.out.println("Would you like to see the DFD of a specific variable?(Answer: Variable/No)");
 				variable = scanner.next();

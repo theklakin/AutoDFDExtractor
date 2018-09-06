@@ -24,12 +24,18 @@ public class InfoContainer {
 	private HashMap<Integer, Entry<Statement,String>> methodCalls;
 	
 	InfoContainer(){
-		setInputs(new ArrayList<>());
-		setParameters(new ArrayList<>());
-		setFields(new HashMap<>());
-		setLibraries(new ArrayList<>());
-		setMethodStmnt(new ArrayList<>());
-		setMethodCalls(new HashMap<>());
+		inputs = new ArrayList<>();
+		//setInputs(new ArrayList<>());
+		parameters = new ArrayList<>();
+		//setParameters(new ArrayList<>());
+		fields = new HashMap<>();
+		//setFields(new HashMap<>());
+		libraries = new ArrayList<>();
+		//setLibraries(new ArrayList<>());
+		methodStmnt = new ArrayList<>();
+		//setMethodStmnt(new ArrayList<>());
+		methodCalls = new HashMap<>();
+		//setMethodCalls(new HashMap<>());
 	}
 
 	public String getMethodName() {

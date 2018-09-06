@@ -14,20 +14,22 @@ public class SpecificDFD {
 	
 	private String file;
 	private String variable;
-	private HashMap<Entry<String,String>, Entry<String,String>> methodCallTrace; //HashMap<Entry<fromM,toM>,<passedData,parameterAlias>>
+	private HashMap<Entry<String,String>, Entry<String,Integer>> methodCallTrace; //HashMap<Entry<fromM,toM>,<passedData,parameterAlias>>
 	private HashMap<String,HashMap<String,String>> alias ;
 	private int threshold;
+	private List<String> methodNames;
 	
 	SpecificDFD(){
 		System.out.println("Object SpecificDFD is created");
 	}
 	
-	SpecificDFD(String file, String variable, HashMap<Entry<String,String>, Entry<String,String>> methodCallTrace, HashMap<String,HashMap<String,String>> alias, int threshold){
+	SpecificDFD(String file, String variable, HashMap<Entry<String,String>, Entry<String,Integer>> methodCallTrace, HashMap<String,HashMap<String,String>> alias, int threshold, List<String> methodNames){
 		this.file = file;
 		this.variable = variable;
 		this.methodCallTrace = methodCallTrace;
 		this.alias = alias;
 		this.threshold = threshold;
+		this.methodNames = methodNames;
 	}
 	
 	public void creteSpecificDFD() {
@@ -77,15 +79,24 @@ public class SpecificDFD {
 							
 							//methodCallTrace: if the requested value is the entry.getValue().getKey() then the entry.getValue().getValue() needs to be shown
 							// but careful the current line needs to contain the method name entry.getKey().getValue()
-							for(Entry<Entry<String,String>,Entry<String,String>> traceEntry: methodCallTrace.entrySet()) {
-								String var = traceEntry.getValue().getKey();
+							for(Entry<Entry<String,String>,Entry<String,Integer>> traceEntry: methodCallTrace.entrySet()) {
+								String meth = traceEntry.getKey().getValue();
+								System.out.println(meth);
+								boolean exists = checkMethods(meth);
+								System.out.println(exists);
+								if(exists) {
+									if(sCurrentLine.contains(meth)) {
+										flows.add(sCurrentLine);
+									}
+								}
+								/*String var = traceEntry.getValue().getKey();
 								if(var.equals(variable)) {
 									String method = traceEntry.getKey().getValue();
 									String varAlias = traceEntry.getValue().getKey();
 									if(sCurrentLine.contains(method) && sCurrentLine.contains(varAlias)) {
 										flows.add(sCurrentLine);
 									}
-								}
+								}*/
 							}
 						}
 					}
@@ -101,6 +112,17 @@ public class SpecificDFD {
 		HashMap<Integer,Entry<String,String>> subDFD = new HashMap<>();
 		DotFileCreator subDFDVis = new DotFileCreator(fileName, subDFD, threshold);
 		subDFDVis.createVisualFile();
+	}
+	
+	private boolean checkMethods(String meth) {
+		boolean exists = false;
+		for(String s : methodNames) {
+			if(s.equals(meth)) {
+				exists = true;
+				break;
+			}
+		}
+		return exists;
 	}
 	
 	private List<String> getAllAliasing() {

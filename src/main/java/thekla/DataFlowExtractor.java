@@ -18,7 +18,7 @@ public class DataFlowExtractor {
 	private HashMap<String,String> dataStores; //name-type
 	private List<ImportDeclaration> externalEntities;
 	private List<String> methodNames;
-	private HashMap<Entry<String,String>, Entry<String,String>> methodCallTrace;
+	private HashMap<Entry<String,String>, Entry<String,Integer>> methodCallTrace;
 	private HashMap<String,HashMap<String,String>> allAlias;
 	private HashMap<String,String> methodAlias;
 	private HashMap<String,String> subDFD= new HashMap<>();
@@ -37,7 +37,7 @@ public class DataFlowExtractor {
 		System.out.println("Done DFDExtractor");
 	}
 	
-	DataFlowExtractor(List<InfoContainer> allDFDInfo, String s, List<String> inputLibs, List<String> outputLibs, List<String> dsLibs){
+	DataFlowExtractor(List<InfoContainer> allDFDInfo, String s, List<String> inputLibs, List<String> outputLibs, List<String> dsLibs, List<String> methodNames){
 		description = s;
 		this.allDFDInfo = allDFDInfo;
 		this.inputLibs = inputLibs;
@@ -45,13 +45,14 @@ public class DataFlowExtractor {
 		this.dsLibs = dsLibs;
 		dataStores = new HashMap<>();
 		externalEntities = allDFDInfo.get(0).getLibraries();
-		methodNames = new ArrayList<>();
+		this.methodNames = methodNames;
 		methodCallTrace = new HashMap<>();
 		allAlias = new HashMap<>();
 		flowsFrom = new HashMap<>();
 		flowsTo = new HashMap<>();
 		flowsName = new HashMap<>();
-		setInoutLib(new ArrayList<>());
+		inoutLib = new ArrayList<>();
+		//setInoutLib(new ArrayList<>());
 		index = 0;
 		
 		for(InfoContainer dfd : allDFDInfo) {
@@ -79,7 +80,7 @@ public class DataFlowExtractor {
 		return allAlias;
 	}
 	
-	public HashMap<Entry<String,String>, Entry<String,String>> getTrace() {
+	public HashMap<Entry<String,String>, Entry<String,Integer>> getTrace() {
 		return methodCallTrace;
 	}
 	
@@ -146,12 +147,11 @@ public class DataFlowExtractor {
 			if(!type.equals("")) {
 				//System.out.println("statement " + statement);
 				//System.out.println("type " + type);
-				traceMethod(state, type, methodName, inputs);
+				
 				String component = "";
 				String entity="";
 				boolean flag = false;					
 				String id = inspectType(type);
-					
 				switch(id) {
 				case "Input" :
 					String[] inputParts = null;
@@ -175,14 +175,18 @@ public class DataFlowExtractor {
 					break;
 				case "Output" :
 					boolean contain = checkState(state,inputs);
+					boolean trace = false;
 					if(contain == false) {
 						for(String libs : outputLibs) {
 							if(type.contains(libs)) {
 								contain = true;
+								trace = true;
 							}
 						}
 					}
-					
+					if(trace==false) {
+						traceMethod(state, type, methodName, inputs);
+					}
 					String alias = inputAlias(state, inputs);
 					if(!alias.equals("")) {
 						inputs.add(alias);
@@ -400,15 +404,18 @@ public class DataFlowExtractor {
 	
 	private void traceMethod(String statement, String type, String methodName, List<String> inputs) {
 		//find a way to aliasing the current data used with the parameters of the other method
-		String entity = "";
-		for(String method : methodNames) {
-			if(type.contains(method)) {
-				entity = method;
-				String al = "";
+		String[] typeParts = type.split("\\(");
+		String[] typeParts2 = typeParts[0].split("\\.");
+		String entity = typeParts2[1] + "_" + typeParts2[2];
+		//for(String method : methodNames) {
+			//if(type.contains(method)) {
+				//entity = method;
+				//String al = "";
 				String[] stateParts = statement.split("\\(");
 				String name = stateParts[1];
 				name = name.replace(")", "");
 				name = name.replace(";", "");
+				//System.out.println("name: " + name);
 				int index = 0;
 				if(name.contains(",")) {
 					String[] nameParts = name.split("\\,");
@@ -422,15 +429,15 @@ public class DataFlowExtractor {
 					}
 					//locate which parameter is used and to which index and keep that
 				}
-				List<Parameter> parameters = getSpecificParam(method);
+				/*List<Parameter> parameters = getSpecificParam(method);
 				if(index==0) {
 					al = "empty";
 				}else {
 					al = parameters.get(index).getNameAsString();
-				}
-				methodCallTrace.put(new SimpleEntry(methodName, entity), new SimpleEntry(name, al));				
-			}
-		}		
+				}*/
+				methodCallTrace.put(new SimpleEntry(methodName, entity), new SimpleEntry(name, index));				
+			//}
+		//}		
 	}
 	
 	private List<Parameter> getSpecificParam(String methodName){

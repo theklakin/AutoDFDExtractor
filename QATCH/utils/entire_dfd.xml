@@ -13,7 +13,7 @@
       <Data_Flow>
         <From>java.math.BigDecimal</From>
         <To>Utils_round</To>
-        <Name>setScale(places,</Name>
+        <Name>setScale(places,RoundingMode.HALF_UP);</Name>
       </Data_Flow>
       <Data_Flow>
         <From>Utils_delete</From>
